@@ -31,4 +31,4 @@ async def read_itme(skip=None, limit=10):
 
 @app.post("/itemtest/")
 async def item_test(item:Item):
-    return f"{item.name} / {item.age}"
+    return f"{item.name} / {item.age}/ asdsada"

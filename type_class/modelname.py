@@ -8,6 +8,5 @@ class ModelName(str, Enum):
 	lenet = "lenet"
 
 class Item(BaseModel):
-    name: Optional[str] = None
-    age: Optional[int] = None
-    
+	name: Optional[str] = None
+	age: Optional[dict] = None

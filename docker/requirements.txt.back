@@ -1,0 +1,4 @@
+requests
+colorlog
+fastapi
+uvicorn

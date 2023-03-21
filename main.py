@@ -2,6 +2,7 @@ from type_class.modelname import *
 from typing import Optional
 from fastapi import FastAPI
 
+# FAST API
 app = FastAPI()
 
 @app.get("/")

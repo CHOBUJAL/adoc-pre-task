@@ -1,11 +1,7 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 from pydantic import BaseModel
 
-class ModelName(str, Enum):
-	alexnet = "alexnet"
-	resnet = "resnet"
-	lenet = "lenet"
 
 class Item(BaseModel):
 	name: Optional[str] = None

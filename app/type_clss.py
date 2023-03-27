@@ -4,5 +4,5 @@ from pydantic import BaseModel
 
 
 class Item(BaseModel):
-	name: Optional[str] = None
-	age: Optional[dict] = None
+	companyId: Optional[str] = None
+	storeId: Optional[str] = None

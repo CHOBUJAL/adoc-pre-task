@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from app import models
 
-# FAST API
+# FAST API Router
 app = FastAPI(responses={404: {"description": "Not found"}})
 app.include_router(models.router)
 

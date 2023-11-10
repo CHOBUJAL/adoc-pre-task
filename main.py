@@ -25,6 +25,7 @@ async def middle_test(request: Request, call_next):
     
         logger.info(f"[Before Request] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"\
                 f"({request.method}) URL : {request.url}\n[Headers] : {request.headers}\n[Bodys] : {request.body}")
+        
         # before reqeust
         response = await call_next(request)
         # after request         

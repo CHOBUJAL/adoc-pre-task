@@ -1,5 +1,5 @@
 from typing import Union, Optional
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Path, Query, Header, Security
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 
@@ -21,6 +21,11 @@ class FakeDB:
     def clear():
         self.data = dict()
 
+async def get_api_key(api_key_header: str = Security(APIKeyHeader(name="x-api-key", auto_error=False))):
+    if api_key_header != '123':
+        raise HTTPException(status_code=401, detail="Invalid or missing API Key")
+    return api_key_header
+
 async def background_test():
     for i in range(5):
         logger.info(i)
@@ -33,12 +38,11 @@ async def dependTest():
     finally:
         db.clear()
         
+        
 @router.get(path="/apikey", description="X-API-Key Test API")
-async def TestApiKey(api_key_header: str=Depends(APIKeyHeader(name="X-API-Key"))):
-    if api_key_header != "123":
-        raise HTTPException(status_code=403, detail="Could not validate credentials")
-    
+async def TestApiKey(api_key_header: str=Security(get_api_key)):
     return {'api key': api_key_header}
+    
     
 @router.get(path="/depends", description="Dependencies Test API")
 async def TestDependencies(a: str, b: str, fakedb: FakeDB = Depends(dependTest)):

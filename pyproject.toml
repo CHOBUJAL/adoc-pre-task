@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "poetry -version"
+version = "0.1.0"
+description = ""
+authors = ["CHOBUJAL <eyej7788@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.6"
+sqlalchemy = "^2.0.36"
+uvicorn = "^0.34.0"
+psycopg2-binary = "^2.9.10"
+pydantic-settings = "^2.7.0"
+requests = "^2.32.3"
+asyncpg = "^0.30.0"
+
+
+[tool.poetry.group.alembic.dependencies]
+alembic = "^1.14.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

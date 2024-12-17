@@ -1,21 +1,34 @@
-version: '3'
+version: '3.8'
 
 services:
-    fastapi:
-        container_name: fastapi
-        image: fastapi
-        environment:
-            - TZ=Asia/Seoul
-        restart: always
-        build: 
-            context: ./docker
-            dockerfile: Dockerfile
-        volumes:
-        - ./:/FastAPI
-        working_dir: /FastAPI
-        network_mode: "host"
-        # entrypoint: /bin/sh
-        # tty: true
-        # stdin_open: true
-        command: uvicorn main:app --reload --host=0.0.0.0 --port=12345 --workers=1
-        # command: gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:10001
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: backend_container
+    volumes:
+      - ./app:/app/app
+    ports:
+      - "8000:8000"
+    # environment:
+    #   - DB_URL=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:${PG_PORT}/${PG_DB}
+    #   - SCRIPT_DB_URL=postgresql://${PG_USER}:${PG_PASSWORD}@localhost:${PG_PORT}/${PG_DB}
+    # depends_on:
+    #   - postgres
+
+#   postgres:
+#     build:
+#       context: ./
+#       dockerfile: Dockerfile.pg
+#     container_name: postgres_container
+#     restart: always
+#     volumes:
+#       - db_data:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+#     environment:
+#       - POSTGRES_USER=${PG_USER}
+#       - POSTGRES_PASSWORD=${PG_PASSWORD}
+
+volumes:
+  db_data: {}

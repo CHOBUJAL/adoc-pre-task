@@ -1,34 +1,29 @@
-version: '3.8'
-
 services:
   backend:
     build:
-      context: ./
       dockerfile: Dockerfile
-    container_name: backend_container
-    volumes:
-      - ./app:/app/app
+    depends_on:
+      - postgres
+    image: backend
+    container_name: backend
+    environment:
+      DB_URL: postgresql://postgres:postgres@postgres:5432/postgres
     ports:
       - "8000:8000"
-    # environment:
-    #   - DB_URL=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:${PG_PORT}/${PG_DB}
-    #   - SCRIPT_DB_URL=postgresql://${PG_USER}:${PG_PASSWORD}@localhost:${PG_PORT}/${PG_DB}
-    # depends_on:
-    #   - postgres
+    volumes:
+      - ./app:/app/app
 
-#   postgres:
-#     build:
-#       context: ./
-#       dockerfile: Dockerfile.pg
-#     container_name: postgres_container
-#     restart: always
-#     volumes:
-#       - db_data:/var/lib/postgresql/data
-#     ports:
-#       - "5432:5432"
-#     environment:
-#       - POSTGRES_USER=${PG_USER}
-#       - POSTGRES_PASSWORD=${PG_PASSWORD}
+  postgres:
+    image: postgres:15
+    container_name: local_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgre_data:/var/lib/postgresql/data\
 
 volumes:
-  db_data: {}
+  postgre_data: {}

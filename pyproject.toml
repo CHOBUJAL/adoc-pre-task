@@ -2,7 +2,7 @@
 name = "poetry -version"
 version = "0.1.0"
 description = ""
-authors = ["CHOBUJAL <eyej7788@gmail.com>"]
+authors = []
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -14,6 +14,7 @@ psycopg2-binary = "^2.9.10"
 pydantic-settings = "^2.7.0"
 requests = "^2.32.3"
 asyncpg = "^0.30.0"
+passlib = "^1.7.4"
 
 
 [tool.poetry.group.alembic.dependencies]

@@ -1,4 +1,5 @@
 import jwt
+from typing import Tuple
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 from app.schemas.user_schemas import SignUpRequest, LoginRequest, SignupResult, LoginResult
@@ -18,7 +19,7 @@ def verify_password(plain_password, hashed_password) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_jwt(user_id: int, exp_sec: int, token_type: str) -> str | datetime:
+def create_jwt(user_id: int, exp_sec: int, token_type: str) -> Tuple[str, datetime]:
     exp_datetime = datetime.now(tz=timezone.utc) + timedelta(seconds=exp_sec)
     return jwt.encode(
         {"user_id": user_id, "exp": exp_datetime, "token_type": token_type},
@@ -40,10 +41,21 @@ def login_user(login_info: LoginRequest, db: Session):# -> LoginResult:
         db=db
     )
     if user is None:
-        return LoginResult(message="no user found", user=None)
+        return LoginResult(message="no user found")
+    
+    if not verify_password(plain_password=login_info.password, hashed_password=user.hashed_password):
+        return LoginResult(message="invalid password")
+    
     
     access_token, _ = create_jwt(user_id=user.id, exp_sec=settings.ACCESS_TOKEN_EXPIRE_SECS, token_type="access")
     refresh_token, refresh_exp = create_jwt(user_id=user.id, exp_sec=settings.REFRESH_TOKEN_EXPIRE_SECS, token_type="refresh")
-    return access_token, refresh_token
-    # login_rst = upsert_refresh_token(login_info=login_info, db=db)
-    # return verify_password(plain_password=login_info.password, hashed_password=user.hashed_password)
+    
+    login_rst = user_repository.upsert_refresh_token(
+        user=user,
+        refresh_token=refresh_token,
+        refresh_exp=refresh_exp,
+        db=db
+    )
+    login_rst.access_token = access_token
+    login_rst.refresh_token = refresh_token
+    return login_rst

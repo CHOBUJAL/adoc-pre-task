@@ -39,8 +39,8 @@ def signup_user(
 def login_user(
     login_info: LoginRequest, db: Annotated[Session, Depends(get_db_session)]
 ):
-    login_rst, a = user_service.login_user(login_info=login_info, db=db)
-    return login_rst, a
+    login_rst = user_service.login_user(login_info=login_info, db=db)
+    return login_rst
 
 
 # @user_router.post("/users/login")

@@ -13,7 +13,7 @@ class SignUpResponse(BaseModel):
     
 class SignupResult(BaseModel):
     message: str
-    user: UserOrm | None
+    user: UserOrm | None = None
     
     model_config = ConfigDict(arbitrary_types_allowed=True)
     
@@ -23,8 +23,12 @@ class LoginRequest(SignUpRequest):
 
 
 class LoginResponse(SignUpResponse):
-    pass
+    access_token: str | None
+    refresh_token: str | None
 
 
-class LoginResult(SignupResult):
-    pass
+class LoginResult(BaseModel):
+    message: str
+    access_token: str | None = None
+    refresh_token: str | None = None
+    

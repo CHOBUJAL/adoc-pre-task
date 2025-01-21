@@ -31,7 +31,7 @@ target_metadata = Base.metadata
 def get_db_url():
     return os.getenv(
         "DB_URL",
-        "postgresql://postgres:postgres@postgres:5432/postgres",
+        "mysql+pymysql://adoc:adoc@mysql-container.docker:3306/adoc",
     )
 
 

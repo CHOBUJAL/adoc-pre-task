@@ -20,6 +20,3 @@ class Base(DeclarativeBase):
         onupdate=lambda: datetime.datetime.now(ZoneInfo("UTC")),
         comment="레코드가 마지막으로 업데이트된 시간 in UTC",
     )
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(
-        DateTime(timezone=True), index=True, default=None, comment="레코드가 지워진 시간 in UTC"
-    )

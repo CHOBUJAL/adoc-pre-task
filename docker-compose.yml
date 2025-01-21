@@ -3,27 +3,46 @@ services:
     build:
       dockerfile: Dockerfile
     depends_on:
-      - postgres
+      - mysql
+      - mongodb
     image: backend
     container_name: backend
     environment:
-      DB_URL: postgresql://postgres:postgres@postgres:5432/postgres
+      DB_URL: mysql+pymysql://adoc:adoc@mysql-container.docker:3306/adoc
+      MONGODB_URI: mongodb://mongodb-container.docker:27017
     ports:
       - "8000:8000"
     volumes:
       - ./app:/app/app
 
-  postgres:
-    image: postgres:15
-    container_name: local_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    hostname: mysql-container.docker
+    restart: always
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: adoc
+      MYSQL_DATABASE: adoc
+      MYSQL_USER: adoc
+      MYSQL_PASSWORD: adoc
     volumes:
-      - postgre_data:/var/lib/postgresql/data\
+      - mysql_data:/var/lib/mysql
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb-container
+    hostname: mongodb-container.docker
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: adoc
+      MONGO_INITDB_ROOT_PASSWORD: adoc
+    volumes:
+      - mongo_data:/data/db
 
 volumes:
-  postgre_data: {}
+  mysql_data: {}
+  mongo_data: {}

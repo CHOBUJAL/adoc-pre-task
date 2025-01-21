@@ -6,7 +6,13 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers.user_router import user_router, user_required_router
+
 app = FastAPI()
+
+app.include_router(user_router)
+app.include_router(user_required_router)
+
 origins = [
     "http://localhost:8000"
 ]

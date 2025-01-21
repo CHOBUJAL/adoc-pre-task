@@ -15,11 +15,8 @@ with Session(engine) as session:
 
     # 초기 유저
     initial_user = UserOrm(
-        name=settings.INIT_USER_NAME,
-        phone_number=settings.INIT_USER_PHONE_NUM,
         email=settings.INIT_USER_EMAIL,
         hashed_password=pwd_context.hash(settings.INIT_USER_PASSWORD,),
-        address=settings.INIT_USER_ADDR,
     )
 
     session.add(initial_user)

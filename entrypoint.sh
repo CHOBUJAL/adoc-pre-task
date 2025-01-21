@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 # DB 준비 대기
+sleep 5
 until alembic upgrade head
 do
   echo "DB not ready"

@@ -1,20 +1,4 @@
 services:
-  backend:
-    build:
-      dockerfile: Dockerfile
-    depends_on:
-      - mysql
-      - mongodb
-    image: backend
-    container_name: backend
-    environment:
-      DB_URL: mysql+pymysql://adoc:adoc@mysql-container.docker:3306/adoc
-      MONGODB_URI: mongodb://mongodb-container.docker:27017
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./app:/app/app
-
   mysql:
     image: mysql:8.0
     container_name: mysql-container
@@ -42,6 +26,21 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: adoc
     volumes:
       - mongo_data:/data/db
+
+  backend:
+    build:
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+      - mongodb
+    container_name: backend
+    environment:
+      DB_URL: mysql+pymysql://adoc:adoc@mysql-container.docker:3306/adoc
+      MONGODB_URI: mongodb://mongodb-container.docker:27017
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
 
 volumes:
   mysql_data: {}

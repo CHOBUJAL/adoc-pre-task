@@ -29,3 +29,12 @@ ruff = "^0.8.3"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+# pyproject.toml
+[tool.ruff]
+line-length = 88              # 한 줄 최대 길이
+select = ["I", "E", "F", "W"]      # 활성화할 규칙
+ignore = ["E203", "E501"]     # 무시할 규칙
+fix = true                    # 자동 수정 활성화
+exclude = ["migration/*"]    # 제외할 디렉토리

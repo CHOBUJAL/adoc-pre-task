@@ -1,11 +1,12 @@
 
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
-from sqlalchemy.dialects.mysql import insert
-from app.models.user_model import UserOrm, RefreshTokenOrm
-from sqlalchemy import select
 from datetime import datetime, timezone
-from app.schemas.user_schemas import SignupResult, LoginResult
+
+from sqlalchemy import select
+from sqlalchemy.dialects.mysql import insert
+from sqlalchemy.orm import Session
+
+from app.models.user_model import RefreshTokenOrm, UserOrm
+from app.schemas.user_schemas import LoginResult, RefreshRequest, SignupResult
 
 
 def get_user_info(email: str, db: Session) -> UserOrm | None:
@@ -19,34 +20,46 @@ def user_signup(email: str, hashed_password: str, db: Session) -> SignupResult:
     input_user = get_user_info(email=email, db=db)
     if input_user:
         return SignupResult(message="already user", user=input_user)
-    
+
     # db에 회원가입 요정 아이디 비밀번호 insert 진행
     new_user = UserOrm(email=email, hashed_password=hashed_password, created_at=datetime.now())
     try:
         db.add(new_user)
         db.commit()
-    except SQLAlchemyError:
+    except Exception:
         db.rollback()
-        return SignupResult(message="error", user=None)
+        return SignupResult(message="error")
     else:
         return SignupResult(message="success", user=new_user)
 
 
 def upsert_refresh_token(
-    user: UserOrm, refresh_token: str, refresh_exp: datetime, db: Session
+    user_id: int, refresh_token: str, refresh_exp: datetime, db: Session
 ) -> LoginResult:
     now = datetime.now(tz=timezone.utc)
-    insert_query = insert(RefreshTokenOrm).values(
-        user_id=user.id,
-        refresh_token=refresh_token,
-        expires_at=refresh_exp,
-        created_at=now
-    )
-    update_query = insert_query.on_duplicate_key_update(
-        refresh_token=insert_query.inserted.refresh_token,
-        expires_at=insert_query.inserted.expires_at,
-        updated_at=now
-    )
-    db.execute(update_query)
-    db.commit()
-    return LoginResult(message="test")
+    insert_data = {
+        "user_id": user_id,
+        "refresh_token": refresh_token,
+        "expires_at": refresh_exp,
+    }
+    try:
+        upsert_query = insert(RefreshTokenOrm).values(insert_data).on_duplicate_key_update(
+            refresh_token=insert_data["refresh_token"],
+            expires_at=insert_data["expires_at"],
+            updated_at=now,
+        )
+        db.execute(upsert_query)
+        db.commit()
+    except Exception:
+        db.rollback()
+        return LoginResult(message="error")
+    else:
+        return LoginResult(message="success")
+
+
+def verify_refresh_token(refresh_body: RefreshRequest, db: Session) -> RefreshTokenOrm | None:
+    refresh_query = select(RefreshTokenOrm).where(
+        RefreshTokenOrm.user_id == refresh_body.user_id,
+        RefreshTokenOrm.refresh_token == refresh_body.refresh_token
+    ).limit(1)
+    return db.scalar(refresh_query)

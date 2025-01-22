@@ -44,7 +44,7 @@ def signup_user(
 @user_router.post("/login")
 def login_user(
     login_info: LoginRequest, db: Annotated[Session, Depends(get_db_session)]
-):
+) -> LoginResponse:
     login_rst = user_service.login_user(login_info=login_info, db=db)
     # server error
     if login_rst.message == "error":

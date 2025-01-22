@@ -3,7 +3,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DB_URL: str = "mysql+pymysql://adoc:adoc@mysql-container.docker/adoc"
-    MONGODB_URI: str = "mongodb://mongodb-container.docker:27017"
+    MONGODB_URI: str = "mongodb://adoc:adoc@mongodb-container.docker:27017/adoc?authSource=admin"
+    MONGO_DB_NAME: str = "adoc"
 
     INIT_USER_EMAIL: str = "test@test.com"
     INIT_USER_PASSWORD: str = "test"

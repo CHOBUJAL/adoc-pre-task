@@ -17,6 +17,7 @@ pymongo = "^4.10.1"
 pymysql = "^1.1.1"
 pyjwt = "^2.10.1"
 cryptography = "^44.0.0"
+mongoengine = "^0.29.1"
 
 
 [tool.poetry.group.alembic.dependencies]

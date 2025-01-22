@@ -1,11 +1,10 @@
-from pymongo import MongoClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from app.settings import settings
+from mongoengine import connect, disconnect
 
 mysql_engine = create_engine(settings.DB_URL, echo=True)
-mongo_client = MongoClient(settings.MONGODB_URI)
 
 
 def get_db_session():
@@ -13,9 +12,16 @@ def get_db_session():
         yield session
 
 
-# def get_mongo_db():
-#     db = mongo_client["your_database_name"]  # 데이터베이스 이름
-#     try:
-#         yield db
-#     finally:
-#         client.close()  #
+def get_mongo_conn():
+    print(1111111)
+    conn = connect(
+        db=settings.MONGO_DB_NAME,
+        alias="default",
+        host=settings.MONGODB_URI
+    )
+    print(22222222)
+    try:
+        yield conn
+        print(33333)
+    finally:
+        disconnect(alias="default")

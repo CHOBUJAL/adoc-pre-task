@@ -8,10 +8,12 @@ from app.schemas.user_schemas import (
     JwtPayLoad,
     LoginRequest,
     LoginResponse,
+    LogoutResponse,
     RefreshRequest,
     RefreshResponse,
     SignUpRequest,
     SignUpResponse,
+    LogoutRequest,
 )
 from app.services import user_service
 
@@ -60,7 +62,7 @@ def login_user(
 
 
 @user_required_router.post("/refresh")
-def get_new_token(
+def refresh_user(
     refresh_body: RefreshRequest,
     jwt_payload: Annotated[JwtPayLoad, Depends(user_service.get_current_user_info)],
     db: Annotated[Session, Depends(get_db_session)]
@@ -68,13 +70,32 @@ def get_new_token(
     if refresh_body.user_id != jwt_payload.user_id:
         raise HTTPException(status_code=401, detail="invalid token")
 
-    get_refresh_rst = user_service.get_new_token(refresh_body=refresh_body, db=db)
+    get_refresh_rst = user_service.refresh_user(refresh_body=refresh_body, db=db)
     # server error
     if not get_refresh_rst:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="error"
         )
-    return RefreshResponse(message="success", status_code=status.HTTP_200_OK, access_token=get_refresh_rst[0])
+    return RefreshResponse(message="success", status_code=status.HTTP_200_OK, access_token=get_refresh_rst)
 
-# TODO: 유효한 access token이면 새로운 토큰 발급 x
+
+@user_required_router.post("/logout")
+def logout_user(
+    logout_body: LogoutRequest,
+    jwt_payload: Annotated[JwtPayLoad, Depends(user_service.get_current_user_info)],
+    db: Annotated[Session, Depends(get_db_session)]
+) -> LogoutResponse:
+    # access token이 무효한 경우 refresh token 관련 작업 중지
+    if logout_body.user_id != jwt_payload.user_id:
+        raise HTTPException(status_code=401, detail="invalid token")
+
+    # logout은 refresh token을 삭제 진행
+    logout_rst = user_service.logout_user(logout_body=logout_body, db=db)
+    if logout_rst.message == "error":
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=logout_rst.message
+        )
+
+    return LogoutResponse(message=logout_rst.message, status_code=status.HTTP_200_OK)

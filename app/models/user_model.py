@@ -25,11 +25,8 @@ class RefreshTokenOrm(Base):
         ForeignKey("users.id", ondelete="CASCADE"),
         comment="user pk", index=True, unique=True
     )
-    refresh_token: Mapped[str] = mapped_column(String(DEFAULT_STRING_LENGTH), comment="사용자 refresh token")
-    expires_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.datetime.now(ZoneInfo("UTC")),
-        comment="레코드가 생성된 시간 in UTC",
+    refresh_token: Mapped[str] = mapped_column(
+        String(DEFAULT_STRING_LENGTH), nullable=True, comment="사용자 refresh token"
     )
 
     # 관계 정의 (users 테이블과 연결)

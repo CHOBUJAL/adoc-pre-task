@@ -49,3 +49,15 @@ class RefreshRequest(BaseModel):
 
 class RefreshResponse(SignUpResponse):
     access_token: str | None = None
+
+
+class LogoutRequest(BaseModel):
+    user_id: int
+
+
+class LogoutResponse(SignUpResponse):
+    pass
+
+
+class LogoutResult(BaseModel):
+    message: str

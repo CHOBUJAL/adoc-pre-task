@@ -2,13 +2,13 @@ from passlib.context import CryptContext
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.core.db import engine
+from app.core.db import mysql_engine
 from app.models.user_model import UserOrm
 from app.settings import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-with Session(engine) as session:
+with Session(mysql_engine) as session:
     if session.scalar(select(func.count()).select_from(UserOrm)):
         print("초기유저 존재")
         quit()

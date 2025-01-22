@@ -33,7 +33,7 @@ services:
     depends_on:
       - mysql
       - mongodb
-    container_name: backend
+    container_name: adoc-backend
     environment:
       DB_URL: mysql+pymysql://adoc:adoc@mysql-container.docker:3306/adoc
       MONGODB_URI: mongodb://mongodb-container.docker:27017

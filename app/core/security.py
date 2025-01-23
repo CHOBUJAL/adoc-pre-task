@@ -7,6 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 
 from app.core.settings import settings
+from app.enums.security_enums import TokenAuth
 from app.enums.security_enums import TokenType
 from app.schemas.user_schemas import JwtPayLoad
 
@@ -45,7 +46,7 @@ def decode_access_token(scheme: str, param: str) -> JwtPayLoad:
     if scheme.lower() != "bearer":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="invalid authentication scheme"
+            detail=TokenAuth.INVALID_AUTH_SCHEME
         )
 
     try:
@@ -57,10 +58,10 @@ def decode_access_token(scheme: str, param: str) -> JwtPayLoad:
         )
     # token이 만료되면
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="access token has expired")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.TOKEN_EXPIRED)
     # token 검증이 실패하면
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid access token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.INVALID_TOKEN)
 
 
 # router 요청에 따른 token 검증 디펜던시

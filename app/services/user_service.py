@@ -25,15 +25,20 @@ from app.schemas.user_schemas import (
 
 
 def signup_user(signup_info: SignUpRequest, db: Session) -> SignupResult:
+    user = user_repository.get_user_info(
+        email=signup_info.email,
+        db=db
+    )
+    if user:
+        return SignupResult(message=UserAuth.ALREADY_USER)
+
     hashed_password = create_hashed_password(plain_password=signup_info.password)
     signup_rst = user_repository.user_signup(
         email=signup_info.email,
         hashed_password=hashed_password,
         db=db
     )
-    # 존재하는 이메일
-    if signup_rst.message == UserAuth.ALREADY_USER:
-        return SignupResult()
+
     return signup_rst
 
 

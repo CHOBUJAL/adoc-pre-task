@@ -37,13 +37,10 @@ def get_user_refresh_token(email: str, db: Session) -> List[Dict[str, Any]]:
 
 
 def user_signup(email: str, hashed_password: str, db: Session) -> SignupResult:
-    # 아이디가 존재하는 경우
-    input_user = get_user_info(email=email, db=db)
-    if input_user:
-        return SignupResult(message=UserAuth.ALREADY_USER, user=input_user)
-
-    # db에 회원가입 요정 아이디 비밀번호 insert 진행
-    new_user = UserOrm(email=email, hashed_password=hashed_password, created_at=datetime.now())
+    # db에 회원가입 요청 아이디 비밀번호 insert 진행
+    new_user = UserOrm(
+        email=email, hashed_password=hashed_password, created_at=datetime.now()
+    )
     try:
         db.add(new_user)
         db.commit()

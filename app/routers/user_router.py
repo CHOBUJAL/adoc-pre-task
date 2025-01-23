@@ -106,7 +106,9 @@ def refresh_user(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.TOKEN_EXPIRED
         )
 
-    return RefreshResponse(message=ResultMessage.SUCCESS, status_code=status.HTTP_200_OK, access_token=get_refresh_rst)
+    return RefreshResponse(
+        message=ResultMessage.SUCCESS, status_code=status.HTTP_200_OK, access_token=get_refresh_rst.access_token
+    )
 
 
 @user_required_router.post("/logout")

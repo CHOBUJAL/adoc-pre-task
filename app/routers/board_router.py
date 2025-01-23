@@ -66,3 +66,10 @@ def get_board(post_id: str) -> BoardGetResponse:
     return BoardGetResponse(
         message=post_rst.message, status_code=status.HTTP_200_OK, post=post_rst.post
     )
+
+
+@board_required_router.put("/{post_id}")
+def put_board(
+    
+)
+# @board_required_router.delete()

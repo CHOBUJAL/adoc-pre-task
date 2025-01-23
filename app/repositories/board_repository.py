@@ -1,6 +1,7 @@
 from bson import ObjectId
 
 from app.enums.common_enums import ResultMessage
+from app.enums.board_enums import BoardAction
 from app.models.board_model import Board
 from app.schemas.board_schemas import (
     BoardBody,
@@ -31,7 +32,7 @@ def get_all_boards() -> BoardGetListResult:
             ) for post in Board.objects()
         ]
     except Exception:
-        return BoardGetListResult(message=ResultMessage.ERROR)
+        return BoardGetListResult(message=BoardAction.CREATE_FAIL)
 
     return BoardGetListResult(message=ResultMessage.SUCCESS, post_list=all_posts)
 

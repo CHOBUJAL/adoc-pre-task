@@ -7,7 +7,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from app.enums.enum import ResultMessage
+from app.enums.common_enums import ResultMessage
+from app.enums.user_enums import TokenType
 from app.repositories import user_repository
 from app.schemas.user_schemas import (
     JwtPayLoad,
@@ -34,7 +35,7 @@ def verify_password(plain_password, hashed_password) -> bool:
 
 # jwt token 생성
 def create_jwt(user_id: int, token_type: str) -> str:
-    exp_sec = settings.ACCESS_TOKEN_EXPIRE_SECS if token_type == "access" else settings.REFRESH_TOKEN_EXPIRE_SECS
+    exp_sec = settings.ACCESS_TOKEN_EXPIRE_SECS if token_type == TokenType.ACCESS else settings.REFRESH_TOKEN_EXPIRE_SECS
     exp_datetime = datetime.now(tz=timezone.utc) + timedelta(seconds=exp_sec)
     jwt_payload = JwtPayLoad(user_id=user_id, exp=exp_datetime, token_type=token_type)
     return jwt.encode(
@@ -60,7 +61,7 @@ def decode_access_token(scheme: str, param: str) -> JwtPayLoad:
         )
 
     try:
-        payload = payload = decode_jwt(jwt_token=param, token_type="access")
+        payload = payload = decode_jwt(jwt_token=param, token_type=TokenType.ACCESS)
         return JwtPayLoad(
             user_id=payload["user_id"],
             exp=payload["exp"],
@@ -110,10 +111,10 @@ def login_user(login_info: LoginRequest, db: Session) -> LoginResult:
         if not refresh_token:
             raise ValueError
         # refresh token decode error 발생하면 token 생성
-        _ = decode_jwt(jwt_token=user.refresh_token, token_type="refresh")
+        _ = decode_jwt(jwt_token=user.refresh_token, token_type=TokenType.REFRESH)
     except (jwt.exceptions.PyJWTError, ValueError):
         # 만료 또는 잘못된 refresh이거나 refresh token 자체가 없으면 db에 upsert
-        refresh_token = create_jwt(user_id=user.id, token_type="refresh")
+        refresh_token = create_jwt(user_id=user.id, token_type=TokenType.REFRESH)
         print(refresh_token)
         login_rst = user_repository.upsert_refresh_token(
             user_id=user.id,
@@ -122,11 +123,11 @@ def login_user(login_info: LoginRequest, db: Session) -> LoginResult:
         )
         if login_rst.message != ResultMessage.ERROR:
             login_rst.refresh_token = refresh_token
-            login_rst.access_token = create_jwt(user_id=user.id, token_type="access")
+            login_rst.access_token = create_jwt(user_id=user.id, token_type=TokenType.ACCESS)
     else:
         login_rst = LoginResult(
             message=ResultMessage.SUCCESS,
-            access_token=create_jwt(user_id=user.id, token_type="access"),
+            access_token=create_jwt(user_id=user.id, token_type=TokenType.ACCESS),
             refresh_token=refresh_token
         )
 
@@ -140,8 +141,8 @@ def refresh_user(refresh_body: RefreshRequest, db: Session) -> str:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid refresh token")
 
     try:
-        payload = decode_jwt(jwt_token=refresh_body.refresh_token, token_type="refresh")
-        return create_jwt(user_id=payload["user_id"], token_type="access")
+        payload = decode_jwt(jwt_token=refresh_body.refresh_token, token_type=TokenType.REFRESH)
+        return create_jwt(user_id=payload["user_id"], token_type=TokenType.ACCESS)
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="refresh token has expired")
     except jwt.InvalidTokenError:

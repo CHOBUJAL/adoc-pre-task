@@ -10,12 +10,10 @@ class JwtPayLoad(BaseModel):
     exp: datetime
     token_type: str
 
-# 공통 응답 모델
 class BaseResponse(BaseModel):
     message: str
     status_code: int | None = None
 
-# 요청 및 결과 모델
 class SignUpRequest(BaseModel):
     email: str
     password: str
@@ -30,7 +28,6 @@ class RefreshRequest(BaseModel):
 class LogoutRequest(BaseModel):
     user_id: int
 
-# 결과 모델
 class SignupResult(BaseModel):
     message: str
     user: UserOrm | None = None
@@ -45,10 +42,13 @@ class LoginResult(BaseModel):
 class LogoutResult(BaseModel):
     message: str
 
-# 응답 모델
+
 class LoginResponse(BaseResponse):
     access_token: str | None = None
     refresh_token: str | None = None
 
 class RefreshResponse(BaseResponse):
     access_token: str | None = None
+
+class RefreshResult(RefreshResponse):
+    pass

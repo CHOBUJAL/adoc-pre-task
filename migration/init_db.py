@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.db import mysql_engine
 from app.models.user_model import UserOrm
-from app.settings import settings
+from app.core.settings import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

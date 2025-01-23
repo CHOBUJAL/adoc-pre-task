@@ -1,10 +1,10 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mongoengine import connect
-from zoneinfo import ZoneInfo
 
 from app.routers.board_router import board_required_router, board_router
 from app.routers.user_router import user_required_router, user_router

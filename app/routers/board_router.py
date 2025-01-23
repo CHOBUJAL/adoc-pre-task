@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.core.security import get_current_user_info
 from app.enums.common_enums import ResultMessage
 from app.schemas.board_schemas import (
     BoardCreateRequest,
@@ -11,7 +12,7 @@ from app.schemas.board_schemas import (
     BoardGetResponse,
 )
 from app.schemas.user_schemas import JwtPayLoad
-from app.services import board_service, user_service
+from app.services import board_service
 
 board_router = APIRouter(
     prefix="/boards",
@@ -19,7 +20,7 @@ board_router = APIRouter(
 )
 board_required_router = APIRouter(
     prefix="/boards",
-    dependencies=[Depends(user_service.get_current_user_info)],
+    dependencies=[Depends(get_current_user_info)],
     tags=["인증이 필요한 게시판 관련 라우터"],
 )
 
@@ -27,7 +28,7 @@ board_required_router = APIRouter(
 @board_required_router.post("")
 def create_board(
     create_info: BoardCreateRequest,
-    jwt_payload: Annotated[JwtPayLoad, Depends(user_service.get_current_user_info)]
+    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)]
 ) -> BoardCreateResponse:
     create_rst = board_service.create_board(create_info=create_info, jwt_payload=jwt_payload)
     if create_rst == ResultMessage.ERROR:

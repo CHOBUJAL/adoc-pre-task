@@ -1,9 +1,9 @@
 import datetime
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from zoneinfo import ZoneInfo
 
 
 class Base(DeclarativeBase):

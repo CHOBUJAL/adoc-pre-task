@@ -7,6 +7,7 @@ from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm import Session
 
 from app.enums.common_enums import ResultMessage
+from app.enums.user_enums import UserAuth
 from app.models.user_model import RefreshTokenOrm, UserOrm
 from app.schemas.user_schemas import (
     LoginResult,
@@ -39,7 +40,7 @@ def user_signup(email: str, hashed_password: str, db: Session) -> SignupResult:
     # 아이디가 존재하는 경우
     input_user = get_user_info(email=email, db=db)
     if input_user:
-        return SignupResult(message="already user", user=input_user)
+        return SignupResult(message=UserAuth.ALREADY_USER, user=input_user)
 
     # db에 회원가입 요정 아이디 비밀번호 insert 진행
     new_user = UserOrm(email=email, hashed_password=hashed_password, created_at=datetime.now())

@@ -57,7 +57,7 @@ def get_all_boards() -> BoardGetListResponse:
 def get_board(post_id: str) -> BoardGetResponse:
     post_rst = board_service.get_board(post_id=post_id)
     if post_rst.message == ResultMessage.ERROR:
-        HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=post_rst.message
         )

@@ -16,4 +16,4 @@ class Board(Document):
     title = StringField(required=True, max_length=50)
     content = StringField(required=True, max_length=300)
     created_at = DateTimeField(default=lambda: datetime.now(tz=timezone.utc))
-    updated_at = DateTimeField()  # 수정시간
+    updated_at = DateTimeField()

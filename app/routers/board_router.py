@@ -1,33 +1,31 @@
 
+from typing import Annotated
+from app.schemas.board_schemas import BoardCreateRequest
+from app.schemas.user_schemas import JwtPayLoad
 from fastapi import APIRouter, Depends
 
 from app.models.board_model import Board
-from app.services import user_service
+from app.services import user_service, board_service
 
 board_router = APIRouter(
     prefix="/boards",
     tags=["인증이 필요없는 게시판 관련 라우터"],
 )
-user_required_router = APIRouter(
-    prefix="/users",
+board_required_router = APIRouter(
+    prefix="/boards",
     dependencies=[Depends(user_service.get_current_user_info)],
-    tags=["인증이 필요한 User 관련 라우터"],
+    tags=["인증이 필요한 게시판 관련 라우터"],
 )
 
 
-"""
-id = StringField(primary_key=True)  # _id
-    author_id = IntField(required=True)  # 저자 id (user_id)
-    title = StringField(required=True, max_length=100)  # 제목
-    content = StringField(required=True)  # 내용
-    created_at = DateTimeField(default=lambda: datetime.now(tz=timezone.utc))  # 생성시간
-    updated_at = DateTimeField()  # 수정시간"""
-@board_router.post("")
-def test():
-    b = Board(
-        author_id=100,
-        title="test",
-        content="kasdnaeskj213123"
-    )
-    b.save()
-    return [{"123": a.content, "11": a.id} for a in Board.objects()]
+@board_required_router.post("")
+def create_board(
+    create_info: BoardCreateRequest,
+    jwt_payload: Annotated[JwtPayLoad, Depends(user_service.get_current_user_info)]
+):
+    return board_service.create_board(create_info=create_info, jwt_payload=jwt_payload)
+
+
+# @board_router.get("")
+# def get_all_boards():
+#     return board_service.get_all_boards()

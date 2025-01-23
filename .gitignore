@@ -139,5 +139,3 @@ dmypy.json
 .vscode/
 /pid/*.pid
 .idea
-
-*.lock

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db_session
+from app.enums.enum import ResultMessage
 from app.schemas.user_schemas import (
     BaseResponse,
     JwtPayLoad,
@@ -48,7 +49,7 @@ def login_user(
 ) -> LoginResponse:
     login_rst = user_service.login_user(login_info=login_info, db=db)
     # server error
-    if login_rst.message == "error":
+    if login_rst.message == ResultMessage.ERROR:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=login_rst.message
@@ -74,9 +75,9 @@ def refresh_user(
     if not get_refresh_rst:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="error"
+            detail=ResultMessage.ERROR
         )
-    return RefreshResponse(message="success", status_code=status.HTTP_200_OK, access_token=get_refresh_rst)
+    return RefreshResponse(message=ResultMessage.SUCCESS, status_code=status.HTTP_200_OK, access_token=get_refresh_rst)
 
 
 @user_required_router.post("/logout")
@@ -91,7 +92,7 @@ def logout_user(
 
     # logout은 refresh token을 삭제 진행
     logout_rst = user_service.logout_user(logout_body=logout_body, db=db)
-    if logout_rst.message == "error":
+    if logout_rst.message == ResultMessage.ERROR:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=logout_rst.message

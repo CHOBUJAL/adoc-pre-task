@@ -7,6 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
+from app.enums.enum import ResultMessage
 from app.repositories import user_repository
 from app.schemas.user_schemas import (
     JwtPayLoad,
@@ -119,12 +120,12 @@ def login_user(login_info: LoginRequest, db: Session) -> LoginResult:
             refresh_token=refresh_token,
             db=db
         )
-        if login_rst.message != "error":
+        if login_rst.message != ResultMessage.ERROR:
             login_rst.refresh_token = refresh_token
             login_rst.access_token = create_jwt(user_id=user.id, token_type="access")
     else:
         login_rst = LoginResult(
-            message="success",
+            message=ResultMessage.SUCCESS,
             access_token=create_jwt(user_id=user.id, token_type="access"),
             refresh_token=refresh_token
         )

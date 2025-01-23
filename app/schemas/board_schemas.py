@@ -15,7 +15,7 @@ class BoardCreateResponse(BoardCreateResult):
     status_code: int
 
 
-class BoardGetResult(BaseModel):
+class BoardBody(BaseModel):
     post_id: str
     author_id: int
     title: str
@@ -26,8 +26,17 @@ class BoardGetResult(BaseModel):
 
 class BoardGetListResult(BaseModel):
     message: str
-    post_list: list[BoardGetResult] = []
+    post_list: list[BoardBody] = []
 
 
 class BoardGetListResponse(BoardGetListResult):
+    status_code: int
+
+
+class BoardGetResult(BaseModel):
+    message: str
+    post: BoardBody | None = None
+
+
+class BoardGetResponse(BoardGetResult):
     status_code: int

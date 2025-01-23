@@ -9,6 +9,7 @@ from app.schemas.board_schemas import (
     BoardCreateRequest,
     BoardCreateResult,
     BoardGetListResult,
+    BoardGetResult,
 )
 from app.schemas.user_schemas import (
     JwtPayLoad,
@@ -25,12 +26,17 @@ def create_board(create_info: BoardCreateRequest, jwt_payload: JwtPayLoad) -> Bo
         author_id=jwt_payload.user_id,
         title=create_info.title,
         content=create_info.content,
-        created_at=get_now_utc
+        created_at=get_now_utc()
     )
 
     return board_repository.create_board(new_post)
 
 
 def get_all_boards() -> BoardGetListResult:
-    all_boards = board_repository.get_all_boards()
-    return all_boards
+    all_posts = board_repository.get_all_boards()
+    return all_posts
+
+
+def get_board(post_id: str) -> BoardGetResult:
+    post = board_repository.get_board(post_id=post_id)
+    return post

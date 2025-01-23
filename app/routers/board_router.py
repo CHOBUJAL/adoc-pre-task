@@ -3,7 +3,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.schemas.board_schemas import BoardCreateRequest, BoardCreateResponse, BoardGetListResponse
+from app.enums.enum import ResultMessage
+from app.schemas.board_schemas import (
+    BoardCreateRequest,
+    BoardCreateResponse,
+    BoardGetListResponse,
+    BoardGetResponse,
+)
 from app.schemas.user_schemas import JwtPayLoad
 from app.services import board_service, user_service
 
@@ -24,8 +30,8 @@ def create_board(
     jwt_payload: Annotated[JwtPayLoad, Depends(user_service.get_current_user_info)]
 ) -> BoardCreateResponse:
     create_rst = board_service.create_board(create_info=create_info, jwt_payload=jwt_payload)
-    if create_rst == "error":
-        HTTPException(
+    if create_rst == ResultMessage.ERROR:
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=create_rst.message
         )
@@ -37,11 +43,25 @@ def create_board(
 @board_router.get("")
 def get_all_boards() -> BoardGetListResponse:
     post_list_rst = board_service.get_all_boards()
-    if post_list_rst.message == "error":
-        HTTPException(
+    if post_list_rst.message == ResultMessage.ERROR:
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=post_list_rst.message
         )
     return BoardGetListResponse(
         message=post_list_rst.message, status_code=status.HTTP_200_OK, post_list=post_list_rst.post_list
+    )
+
+
+@board_router.get("/{post_id}")
+def get_board(post_id: str) -> BoardGetResponse:
+    post_rst = board_service.get_board(post_id=post_id)
+    if post_rst.message == ResultMessage.ERROR:
+        HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=post_rst.message
+        )
+
+    return BoardGetResponse(
+        message=post_rst.message, status_code=status.HTTP_200_OK, post=post_rst.post
     )

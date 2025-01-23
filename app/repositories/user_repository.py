@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm import Session
 
+from app.enums.enum import ResultMessage
 from app.models.user_model import RefreshTokenOrm, UserOrm
 from app.schemas.user_schemas import (
     LoginResult,
@@ -47,9 +48,9 @@ def user_signup(email: str, hashed_password: str, db: Session) -> SignupResult:
         db.commit()
     except Exception:
         db.rollback()
-        return SignupResult(message="error")
+        return SignupResult(message=ResultMessage.ERROR)
     else:
-        return SignupResult(message="success", user=new_user)
+        return SignupResult(message=ResultMessage.SUCCESS, user=new_user)
 
 
 def upsert_refresh_token(
@@ -69,9 +70,9 @@ def upsert_refresh_token(
         db.commit()
     except Exception:
         db.rollback()
-        return LoginResult(message="error")
+        return LoginResult(message=ResultMessage.ERROR)
     else:
-        return LoginResult(message="success")
+        return LoginResult(message=ResultMessage.SUCCESS)
 
 
 def verify_refresh_token(refresh_body: RefreshRequest, db: Session) -> RefreshTokenOrm | None:
@@ -92,6 +93,6 @@ def refresh_token_to_null(logout_body: LogoutRequest, db: Session) -> LogoutResu
         db.commit()
     except Exception:
         db.rollback()
-        return LogoutResult(message="error")
+        return LogoutResult(message=ResultMessage.ERROR)
     else:
-        return LogoutResult(message="success")
+        return LogoutResult(message=ResultMessage.SUCCESS)

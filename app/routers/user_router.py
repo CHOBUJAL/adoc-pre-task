@@ -1,13 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db_session
 from app.core.security import get_current_user_info
 from app.enums.common_enums import ResultMessage
 from app.enums.security_enums import TokenAuth
-from app.enums.user_enums import UserAuth
+from app.exceptions.user_exception import user_exception_handler
 from app.schemas.user_schemas import (
     BaseResponse,
     JwtPayLoad,
@@ -36,17 +36,8 @@ def signup_user(
     signup_info: SignUpRequest, db: Annotated[Session, Depends(get_db_session)]
 ) -> BaseResponse:
     signup_rst = user_service.signup_user(signup_info=signup_info, db=db)
-    # server error
-    if signup_rst.user is None:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=signup_rst.message
-        )
-    # 이미 있는 유저 정보
-    if signup_rst.message == UserAuth.ALREADY_USER:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=UserAuth.ALREADY_USER
-        )
+    if signup_rst.message != ResultMessage.SUCCESS:
+        user_exception_handler(detail=signup_rst.message)
 
     return BaseResponse(message=signup_rst.message, status_code=status.HTTP_200_OK)
 
@@ -56,22 +47,8 @@ def login_user(
     login_info: LoginRequest, db: Annotated[Session, Depends(get_db_session)]
 ) -> LoginResponse:
     login_rst = user_service.login_user(login_info=login_info, db=db)
-    # server error
-    if login_rst.message == ResultMessage.ERROR:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=login_rst.message
-        )
-    # 없는 유저 정보
-    elif login_rst.message == UserAuth.NO_USER_FOUND:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=UserAuth.NO_USER_FOUND
-        )
-    # 잘못된 비밀번호
-    elif login_rst.message == UserAuth.INVALID_PASSWORD:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=UserAuth.INVALID_PASSWORD
-        )
+    if login_rst.message != ResultMessage.SUCCESS:
+        user_exception_handler(detail=login_rst.message)
 
     return LoginResponse(
         message=login_rst.message, status_code=status.HTTP_200_OK, user_id=login_rst.user_id,
@@ -86,25 +63,11 @@ def refresh_user(
     db: Annotated[Session, Depends(get_db_session)]
 ) -> RefreshResponse:
     if refresh_body.user_id != jwt_payload.user_id:
-        raise HTTPException(status_code=401, detail=TokenAuth.INVALID_TOKEN)
+        user_exception_handler(detail=TokenAuth.INVALID_TOKEN)
 
     get_refresh_rst = user_service.refresh_user(refresh_body=refresh_body, db=db)
-    # server error
-    if get_refresh_rst.message == ResultMessage.ERROR:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=ResultMessage.ERROR
-        )
-    # 유효하지 않은 토큰이면
-    elif get_refresh_rst.message == TokenAuth.INVALID_TOKEN:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.INVALID_TOKEN
-        )
-    # 만료된 토큰이면
-    elif get_refresh_rst.message == TokenAuth.TOKEN_EXPIRED:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.TOKEN_EXPIRED
-        )
+    if get_refresh_rst.message != ResultMessage.SUCCESS:
+        user_exception_handler(detail=get_refresh_rst.message)
 
     return RefreshResponse(
         message=ResultMessage.SUCCESS, status_code=status.HTTP_200_OK, access_token=get_refresh_rst.access_token
@@ -119,14 +82,11 @@ def logout_user(
 ) -> BaseResponse:
     # access token이 무효한 경우 refresh token 관련 작업 중지
     if logout_body.user_id != jwt_payload.user_id:
-        raise HTTPException(status_code=401, detail=TokenAuth.INVALID_TOKEN)
+        user_exception_handler(detail=TokenAuth.INVALID_TOKEN)
 
     # logout은 refresh token을 삭제 진행
     logout_rst = user_service.logout_user(logout_body=logout_body, db=db)
-    if logout_rst.message == ResultMessage.ERROR:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=logout_rst.message
-        )
+    if logout_rst.message != ResultMessage.SUCCESS:
+        user_exception_handler(detail=logout_rst.message)
 
     return BaseResponse(message=logout_rst.message, status_code=status.HTTP_200_OK)

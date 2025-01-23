@@ -1,16 +1,19 @@
 from bson import ObjectId
+from mongoengine.errors import DoesNotExist
 
-from app.enums.common_enums import ResultMessage
+from app.core.utils import get_now_utc
 from app.enums.board_enums import BoardAction
+from app.enums.common_enums import ResultMessage
 from app.models.board_model import Board
 from app.schemas.board_schemas import (
     BoardBody,
     BoardCreateResult,
+    BoardDeleteResult,
     BoardGetListResult,
     BoardGetResult,
+    BoardPutRequest,
+    BoardPutResult,
 )
-from mongoengine.errors import DoesNotExist
-from bson.errors import InvalidId
 
 
 def create_board(new_post: Board) -> BoardCreateResult:
@@ -34,7 +37,7 @@ def get_all_boards() -> BoardGetListResult:
             ) for post in Board.objects()
         ]
     except Exception:
-        return BoardGetListResult(message=BoardAction.CREATE_FAIL)
+        return BoardGetListResult(message=ResultMessage.ERROR)
 
     return BoardGetListResult(message=ResultMessage.SUCCESS, post_list=all_posts)
 
@@ -44,8 +47,6 @@ def get_board(post_id: str) -> BoardGetResult:
         post = Board.objects.get(id=ObjectId(post_id))
     except DoesNotExist:
         return BoardGetResult(message=BoardAction.NO_POST_FOUND)
-    except InvalidId:
-        return BoardGetResult(message=BoardAction.INVALID_ID_FORMAT)
     except Exception:
         return BoardGetResult(message=ResultMessage.ERROR)
     return BoardGetResult(
@@ -59,3 +60,26 @@ def get_board(post_id: str) -> BoardGetResult:
             updated_at=post.updated_at,
         )
     )
+
+def delete_board(post_id: str) -> BoardDeleteResult:
+    try:
+        post = Board.objects.get(id=ObjectId(post_id))
+        post.delete()
+    except Exception:
+        return BoardDeleteResult(message=ResultMessage.ERROR)
+    return BoardDeleteResult(message=ResultMessage.SUCCESS, post_id=post_id)
+
+
+def put_board(post_body: BoardBody, put_info: BoardPutRequest) -> BoardPutResult:
+    try:
+        put_post = Board.objects.get(id=ObjectId(post_body.post_id))
+        if put_info.title:
+            put_post.title = put_info.title
+        if put_info.content:
+            put_post.content = put_info.content
+        if put_info.title or put_info.content:
+            put_post.updated_at = get_now_utc()
+        put_post.save()
+    except Exception:
+        return BoardPutResult(message=ResultMessage.ERROR)
+    return BoardPutResult(message=ResultMessage.SUCCESS, post_id=str(put_post.id))

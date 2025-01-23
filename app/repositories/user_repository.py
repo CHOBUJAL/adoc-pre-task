@@ -7,7 +7,6 @@ from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm import Session
 
 from app.enums.common_enums import ResultMessage
-from app.enums.user_enums import UserAuth
 from app.models.user_model import RefreshTokenOrm, UserOrm
 from app.schemas.user_schemas import (
     LoginResult,

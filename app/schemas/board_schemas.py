@@ -46,3 +46,10 @@ class BoardDeleteResult(BoardCreateResult):
     pass
 class BoardDeleteResponse(BoardCreateResponse):
     pass
+
+class BoardPutRequest(BoardCreateRequest):
+    title: str | None = None
+    content: str | None = None
+
+class BoardPutResult(BoardCreateResult):
+    pass

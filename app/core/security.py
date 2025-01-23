@@ -7,8 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 
 from app.core.settings import settings
-from app.enums.security_enums import TokenAuth
-from app.enums.security_enums import TokenType
+from app.enums.security_enums import TokenAuth, TokenType
 from app.schemas.user_schemas import JwtPayLoad
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

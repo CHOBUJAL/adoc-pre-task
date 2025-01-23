@@ -1,22 +1,33 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
-
+from pydantic import BaseModel
 
 
 class BoardCreateRequest(BaseModel):
     title: str
     content: str
 
-class BoardCreateResponse(BaseModel):
+class BoardCreateResult(BaseModel):
     message: str
-    status_code: int
-    post_id: str
+    post_id: str | None = None
 
-class BoardGetResponse(BaseModel):
+class BoardCreateResponse(BoardCreateResult):
+    status_code: int
+
+
+class BoardGetResult(BaseModel):
     post_id: str
     author_id: int
     title: str
     content: str
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None
+
+
+class BoardGetListResult(BaseModel):
+    message: str
+    post_list: list[BoardGetResult] = []
+
+
+class BoardGetListResponse(BoardGetListResult):
+    status_code: int

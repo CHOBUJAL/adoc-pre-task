@@ -5,15 +5,14 @@ from sqlalchemy.orm import Session
 
 from app.core.db import get_db_session
 from app.schemas.user_schemas import (
+    BaseResponse,
     JwtPayLoad,
     LoginRequest,
     LoginResponse,
     LogoutRequest,
-    LogoutResponse,
     RefreshRequest,
     RefreshResponse,
     SignUpRequest,
-    SignUpResponse,
 )
 from app.services import user_service
 
@@ -31,7 +30,7 @@ user_required_router = APIRouter(
 @user_router.post("/signup")
 def signup_user(
     signup_info: SignUpRequest, db: Annotated[Session, Depends(get_db_session)]
-) -> SignUpResponse:
+) -> BaseResponse:
     signup_rst = user_service.signup_user(signup_info=signup_info, db=db)
     # server error
     if signup_rst.user is None:
@@ -40,7 +39,7 @@ def signup_user(
             detail=signup_rst.message
         )
 
-    return SignUpResponse(message=signup_rst.message, status_code=status.HTTP_200_OK)
+    return BaseResponse(message=signup_rst.message, status_code=status.HTTP_200_OK)
 
 
 @user_router.post("/login")
@@ -85,7 +84,7 @@ def logout_user(
     logout_body: LogoutRequest,
     jwt_payload: Annotated[JwtPayLoad, Depends(user_service.get_current_user_info)],
     db: Annotated[Session, Depends(get_db_session)]
-) -> LogoutResponse:
+) -> BaseResponse:
     # access token이 무효한 경우 refresh token 관련 작업 중지
     if logout_body.user_id != jwt_payload.user_id:
         raise HTTPException(status_code=401, detail="invalid token")
@@ -98,4 +97,4 @@ def logout_user(
             detail=logout_rst.message
         )
 
-    return LogoutResponse(message=logout_rst.message, status_code=status.HTTP_200_OK)
+    return BaseResponse(message=logout_rst.message, status_code=status.HTTP_200_OK)

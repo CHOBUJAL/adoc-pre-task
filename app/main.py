@@ -4,11 +4,10 @@ from zoneinfo import ZoneInfo
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.routers.user_router import user_required_router, user_router
-from app.routers.board_router import board_router
-
 from mongoengine import connect
+
+from app.routers.board_router import board_router
+from app.routers.user_router import user_required_router, user_router
 
 app = FastAPI()
 

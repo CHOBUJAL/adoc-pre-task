@@ -1,20 +1,18 @@
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
 
-from app.core.db import get_db_session, get_mongo_conn
 from app.models.board_model import Board
+from app.services import user_service
 
 board_router = APIRouter(
     prefix="/boards",
     tags=["인증이 필요없는 게시판 관련 라우터"],
 )
-# user_required_router = APIRouter(
-#     prefix="/users",
-#     dependencies=[Depends(user_service.get_current_user_info)],
-#     tags=["인증이 필요한 User 관련 라우터"],
-# )
+user_required_router = APIRouter(
+    prefix="/users",
+    dependencies=[Depends(user_service.get_current_user_info)],
+    tags=["인증이 필요한 User 관련 라우터"],
+)
 
 
 """

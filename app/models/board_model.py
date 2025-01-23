@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
-from mongoengine import Document, StringField, DateTimeField, IntField
+
+from mongoengine import DateTimeField, Document, IntField, StringField
 
 
 class Board(Document):
@@ -7,12 +8,12 @@ class Board(Document):
         "collection": "boards",
         "db_alias": "default",
         "indexes": [
-            "author_id"
+            "author_id", "title"
         ]
     }
 
-    author_id = IntField(required=True)  # 저자 id (user_id)
-    title = StringField(required=True, max_length=50)  # 제목
-    content = StringField(required=True, max_length=300)  # 내용
-    created_at = DateTimeField(default=lambda: datetime.now(tz=timezone.utc))  # 생성시간
+    author_id = IntField(required=True)
+    title = StringField(required=True, max_length=50)
+    content = StringField(required=True, max_length=300)
+    created_at = DateTimeField(default=lambda: datetime.now(tz=timezone.utc))
     updated_at = DateTimeField()  # 수정시간

@@ -1,13 +1,19 @@
 
 from datetime import datetime, timezone
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from sqlalchemy import select, update
 from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm import Session
 
 from app.models.user_model import RefreshTokenOrm, UserOrm
-from app.schemas.user_schemas import LoginResult, LogoutRequest, LogoutResult, RefreshRequest, SignupResult
+from app.schemas.user_schemas import (
+    LoginResult,
+    LogoutRequest,
+    LogoutResult,
+    RefreshRequest,
+    SignupResult,
+)
 
 
 def get_user_info(email: str, db: Session) -> UserOrm | None:

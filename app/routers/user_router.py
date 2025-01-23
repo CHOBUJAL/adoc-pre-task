@@ -8,12 +8,12 @@ from app.schemas.user_schemas import (
     JwtPayLoad,
     LoginRequest,
     LoginResponse,
+    LogoutRequest,
     LogoutResponse,
     RefreshRequest,
     RefreshResponse,
     SignUpRequest,
     SignUpResponse,
-    LogoutRequest,
 )
 from app.services import user_service
 

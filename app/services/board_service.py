@@ -3,6 +3,7 @@ from app.repositories import board_repository
 from app.schemas.board_schemas import (
     BoardCreateRequest,
     BoardCreateResult,
+    BoardDeleteResult,
     BoardGetListResult,
     BoardGetResult,
 )
@@ -32,3 +33,6 @@ def get_all_boards() -> BoardGetListResult:
     all_posts = board_repository.get_all_boards()
     return all_posts
 
+
+# def delete_board(post_id: str, jwt_payload: JwtPayLoad) -> BoardDeleteResult:
+#     return board_repository.delete_board(post_id=post_id, jwt_payload=jwt_payload)

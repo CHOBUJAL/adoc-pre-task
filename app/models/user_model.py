@@ -11,7 +11,7 @@ class UserOrm(Base):
     __table_args__ = {"comment": "사용자 정보"}
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(DEFAULT_STRING_LENGTH), comment="사용자 이메일")
+    email: Mapped[str] = mapped_column(String(DEFAULT_STRING_LENGTH), comment="사용자 이메일", unique=True)
     hashed_password: Mapped[str] = mapped_column(String(DEFAULT_STRING_LENGTH), comment="사용자 비밀번호")
 
 class RefreshTokenOrm(Base):

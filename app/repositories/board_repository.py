@@ -9,6 +9,8 @@ from app.schemas.board_schemas import (
     BoardGetListResult,
     BoardGetResult,
 )
+from mongoengine.errors import DoesNotExist
+from bson.errors import InvalidId
 
 
 def create_board(new_post: Board) -> BoardCreateResult:
@@ -40,6 +42,10 @@ def get_all_boards() -> BoardGetListResult:
 def get_board(post_id: str) -> BoardGetResult:
     try:
         post = Board.objects.get(id=ObjectId(post_id))
+    except DoesNotExist:
+        return BoardGetResult(message=BoardAction.NO_POST_FOUND)
+    except InvalidId:
+        return BoardGetResult(message=BoardAction.INVALID_ID_FORMAT)
     except Exception:
         return BoardGetResult(message=ResultMessage.ERROR)
     return BoardGetResult(

@@ -74,7 +74,7 @@ def login_user(
         )
 
     return LoginResponse(
-        message=login_rst.message, status_code=status.HTTP_200_OK,
+        message=login_rst.message, status_code=status.HTTP_200_OK, user_id=login_rst.user_id,
         access_token=login_rst.access_token, refresh_token=login_rst.refresh_token
     )
 

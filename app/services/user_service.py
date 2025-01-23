@@ -71,11 +71,13 @@ def login_user(login_info: LoginRequest, db: Session) -> LoginResult:
             db=db
         )
         if login_rst.message != ResultMessage.ERROR:
+            login_rst.user_id = user.id
             login_rst.refresh_token = refresh_token
             login_rst.access_token = create_jwt(user_id=user.id, token_type=TokenType.ACCESS)
     else:
         login_rst = LoginResult(
             message=ResultMessage.SUCCESS,
+            user_id=user.id,
             access_token=create_jwt(user_id=user.id, token_type=TokenType.ACCESS),
             refresh_token=refresh_token
         )

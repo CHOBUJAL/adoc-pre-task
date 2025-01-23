@@ -40,3 +40,9 @@ class BoardGetResult(BaseModel):
 
 class BoardGetResponse(BoardGetResult):
     status_code: int
+
+
+class BoardDeleteResult(BoardCreateResult):
+    pass
+class BoardDeleteResponse(BoardCreateResponse):
+    pass

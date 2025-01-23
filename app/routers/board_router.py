@@ -8,6 +8,7 @@ from app.enums.common_enums import ResultMessage
 from app.schemas.board_schemas import (
     BoardCreateRequest,
     BoardCreateResponse,
+    BoardDeleteResponse,
     BoardGetListResponse,
     BoardGetResponse,
 )
@@ -68,8 +69,23 @@ def get_board(post_id: str) -> BoardGetResponse:
     )
 
 
-@board_required_router.put("/{post_id}")
-def put_board(
+# @board_required_router.put("/{post_id}")
+# def put_board(
     
-)
-# @board_required_router.delete()
+# )
+
+# @board_required_router.delete("/{post_id}")
+# def delete_board(
+#     post_id: str,
+#     jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)]
+# ) -> BoardDeleteResponse:
+#     delete_rst = board_service.delete_board(post_id=post_id, jwt_payload=jwt_payload)
+#     if delete_rst.message == ResultMessage.ERROR:
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=delete_rst.message
+#         )
+
+#     return BoardDeleteResponse(
+#         message=delete_rst.message, status_code=status.HTTP_200_OK, post_id=delete_rst.post_id
+#     )

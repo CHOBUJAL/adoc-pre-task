@@ -36,6 +36,7 @@ class SignupResult(BaseModel):
 
 class LoginResult(BaseModel):
     message: str
+    user_id: int | None = None
     access_token: str | None = None
     refresh_token: str | None = None
 
@@ -44,6 +45,7 @@ class LogoutResult(BaseModel):
 
 
 class LoginResponse(BaseResponse):
+    user_id: int | None = None
     access_token: str | None = None
     refresh_token: str | None = None
 

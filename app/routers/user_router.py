@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db_session
-from app.enums.enum import ResultMessage
+from app.enums.common_enums import ResultMessage
 from app.schemas.user_schemas import (
     BaseResponse,
     JwtPayLoad,

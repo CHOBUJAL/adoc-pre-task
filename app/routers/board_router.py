@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.enums.enum import ResultMessage
+from app.enums.common_enums import ResultMessage
 from app.schemas.board_schemas import (
     BoardCreateRequest,
     BoardCreateResponse,

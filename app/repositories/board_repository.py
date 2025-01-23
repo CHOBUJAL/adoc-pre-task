@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from app.enums.enum import ResultMessage
+from app.enums.common_enums import ResultMessage
 from app.models.board_model import Board
 from app.schemas.board_schemas import (
     BoardBody,

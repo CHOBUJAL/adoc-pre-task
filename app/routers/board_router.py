@@ -15,6 +15,7 @@ from app.schemas.board_schemas import (
     BoardDeleteResponse,
     BoardGetListResponse,
     BoardGetResponse,
+    BoardListQueryRequest,
     BoardPutRequest,
 )
 from app.schemas.user_schemas import JwtPayLoad
@@ -45,7 +46,7 @@ board_required_router = APIRouter(
 def create_board(
     create_info: BoardCreateRequest,
     jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)],
-    mongo: Annotated[None, Depends(get_mongo_conn)],
+    mongo: Annotated[None, Depends(get_mongo_conn)] = None,
 ) -> BoardCreateResponse:
     create_rst = board_service.create_board(create_info=create_info, jwt_payload=jwt_payload)
     if create_rst != ResultMessage.SUCCESS:
@@ -56,19 +57,25 @@ def create_board(
 
 
 @board_router.get("")
-def get_all_boards(mongo: Annotated[None, Depends(get_mongo_conn)],) -> BoardGetListResponse:
-    post_list_rst = board_service.get_all_boards()
+def get_all_boards(
+    boards_query: BoardListQueryRequest = Depends(),
+    mongo: Annotated[None, Depends(get_mongo_conn)] = None ,
+) -> BoardGetListResponse:
+    post_list_rst = board_service.get_all_boards(boards_query=boards_query)
     if post_list_rst.message != ResultMessage.SUCCESS:
         board_exception_handler(detail=post_list_rst.message)
     return BoardGetListResponse(
-        message=post_list_rst.message, status_code=status.HTTP_200_OK, post_list=post_list_rst.post_list
+        message=post_list_rst.message,
+        status_code=status.HTTP_200_OK,
+        post_list=post_list_rst.post_list,
+        total_count=post_list_rst.total_count
     )
 
 
 @board_router.get("/{post_id}")
 def get_board(
     post_id: Annotated[str, Depends(validate_post_id)],
-    mongo: Annotated[None, Depends(get_mongo_conn)],
+    mongo: Annotated[None, Depends(get_mongo_conn)] = None,
 ) -> BoardGetResponse:
     post_rst = board_service.get_board(post_id=post_id)
     if post_rst.message != ResultMessage.SUCCESS:
@@ -82,7 +89,7 @@ def get_board(
 def delete_board(
     post_id: Annotated[str, Depends(validate_post_id)],
     jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)],
-    mongo: Annotated[None, Depends(get_mongo_conn)],
+    mongo: Annotated[None, Depends(get_mongo_conn)] = None,
 ) -> BoardDeleteResponse:
     delete_rst = board_service.delete_board(post_id=post_id, jwt_payload=jwt_payload)
     if delete_rst.message != ResultMessage.SUCCESS:
@@ -91,12 +98,13 @@ def delete_board(
         message=delete_rst.message, status_code=status.HTTP_200_OK, post_id=delete_rst.post_id
     )
 
+
 @board_required_router.put("/{post_id}")
 def put_board(
     put_info: BoardPutRequest,
     post_id: Annotated[str, Depends(validate_post_id)],
     jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)],
-    mongo: Annotated[None, Depends(get_mongo_conn)],
+    mongo: Annotated[None, Depends(get_mongo_conn)] = None,
 ):
     put_rst = board_service.put_board(
         put_info=put_info, post_id=post_id, jwt_payload=jwt_payload

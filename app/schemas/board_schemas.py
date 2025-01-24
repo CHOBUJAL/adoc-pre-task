@@ -1,7 +1,13 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from app.enums.board_enums import BoardOrderType
+
+
+class BasePageSchema(BaseModel):
+    page: int = Field(default=1, min=1)
+    page_size: int = Field(default=10, max=50)
 
 class BoardCreateRequest(BaseModel):
     title: str
@@ -24,9 +30,15 @@ class BoardBody(BaseModel):
     updated_at: datetime | None
 
 
-class BoardGetListResult(BaseModel):
+class BoardListQueryRequest(BasePageSchema):
+    user_id: int | None = None
+    title: str | None = None
+    order_type: BoardOrderType = BoardOrderType.CREATE_AT_LATEST
+
+class BoardGetListResult(BasePageSchema):
     message: str
     post_list: list[BoardBody] = []
+    total_count: int | None = None
 
 
 class BoardGetListResponse(BoardGetListResult):

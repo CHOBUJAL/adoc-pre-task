@@ -11,6 +11,7 @@ from app.schemas.board_schemas import (
     BoardDeleteResult,
     BoardGetListResult,
     BoardGetResult,
+    BoardListQueryRequest,
     BoardPutRequest,
     BoardPutResult,
 )
@@ -24,8 +25,24 @@ def create_board(new_post: Board) -> BoardCreateResult:
     return BoardCreateResult(message=ResultMessage.SUCCESS, post_id=str(new_post.id))
 
 
-def get_all_boards() -> BoardGetListResult:
+def get_all_boards(boards_query: BoardListQueryRequest) -> BoardGetListResult:
     try:
+        # 게시글 필터
+        filter_boards = Board.objects()
+        if boards_query.user_id:
+            filter_boards = filter_boards.filter(author_id=boards_query.user_id)
+        if boards_query.title:
+            # 대소문자 구분 x
+            filter_boards = filter_boards.filter(title__regex=f"(?i){boards_query.title}")
+
+        # 게시글 정렬
+        filter_boards = filter_boards.order_by(boards_query.order_type)
+
+         # 페이지네이션
+        total_count = filter_boards.count()
+        skip = (boards_query.page - 1) * boards_query.page_size  # 건너뛸 문서 수
+        filter_boards = filter_boards.skip(skip).limit(boards_query.page_size)  # 페이지네이션 적용
+
         all_posts = [
             BoardBody(
                 post_id=str(post.id),
@@ -34,12 +51,17 @@ def get_all_boards() -> BoardGetListResult:
                 content=post.content,
                 created_at=post.created_at,
                 updated_at=post.updated_at,
-            ) for post in Board.objects()
+            ) for post in filter_boards
         ]
-    except Exception:
+    except Exception as e:
+        print(e)
         return BoardGetListResult(message=ResultMessage.ERROR)
 
-    return BoardGetListResult(message=ResultMessage.SUCCESS, post_list=all_posts)
+    return BoardGetListResult(
+        message=ResultMessage.SUCCESS,
+        post_list=all_posts,
+        total_count=total_count
+    )
 
 
 def get_board(post_id: str) -> BoardGetResult:

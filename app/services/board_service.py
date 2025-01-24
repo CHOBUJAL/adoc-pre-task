@@ -9,6 +9,7 @@ from app.schemas.board_schemas import (
     BoardDeleteResult,
     BoardGetListResult,
     BoardGetResult,
+    BoardListQueryRequest,
     BoardPutRequest,
     BoardPutResult,
 )
@@ -29,12 +30,14 @@ def create_board(
 
     return board_repository.create_board(new_post)
 
+
 def get_board(post_id: str) -> BoardGetResult:
     post = board_repository.get_board(post_id=post_id)
     return post
 
-def get_all_boards() -> BoardGetListResult:
-    all_posts = board_repository.get_all_boards()
+
+def get_all_boards(boards_query: BoardListQueryRequest) -> BoardGetListResult:
+    all_posts = board_repository.get_all_boards(boards_query=boards_query)
     return all_posts
 
 

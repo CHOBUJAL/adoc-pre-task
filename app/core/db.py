@@ -13,4 +13,4 @@ def get_db_session():
         yield session
 
 def get_mongo_conn():
-    yield
+    yield None

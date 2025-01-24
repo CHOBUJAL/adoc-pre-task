@@ -7,8 +7,8 @@ from app.models.user_model import UserOrm
 
 class JwtPayLoad(BaseModel):
     user_id: int
-    exp: datetime
-    token_type: str
+    exp: datetime = None
+    token_type: str = None
 
 class BaseResponse(BaseModel):
     message: str

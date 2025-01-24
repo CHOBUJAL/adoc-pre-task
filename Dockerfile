@@ -11,7 +11,7 @@ COPY pyproject.toml .
 COPY poetry.lock .
 
 RUN pip install "poetry==1.8.3" poetry-plugin-export
-RUN poetry export -f requirements.txt --output /tmp/requirements.txt --without-hashes --with dev --with alembic
+RUN poetry export -f requirements.txt --output /tmp/requirements.txt --without-hashes --with dev --with alembic --with test
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt

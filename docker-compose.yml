@@ -13,6 +13,7 @@ services:
       MYSQL_PASSWORD: adoc
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./create_multi_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   mongodb:
     image: mongo:6.0
@@ -36,7 +37,7 @@ services:
     container_name: adoc-backend
     environment:
       DB_URL: mysql+pymysql://adoc:adoc@mysql-container.docker:3306/adoc
-      MONGODB_URI: mongodb://mongodb-container.docker:27017
+      MONGODB_URI: mongodb://adoc:adoc@mongodb-container.docker:27017/adoc?authSource=admin
     ports:
       - "8000:8000"
     volumes:

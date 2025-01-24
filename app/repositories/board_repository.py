@@ -53,8 +53,7 @@ def get_all_boards(boards_query: BoardListQueryRequest) -> BoardGetListResult:
                 updated_at=post.updated_at,
             ) for post in filter_boards
         ]
-    except Exception as e:
-        print(e)
+    except Exception:
         return BoardGetListResult(message=ResultMessage.ERROR)
 
     return BoardGetListResult(

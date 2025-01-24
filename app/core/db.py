@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.core.settings import settings
 
+
 mysql_engine = create_engine(settings.DB_URL, echo=True)
-connect(db='adoc', host='mongodb://adoc:adoc@mongodb-container.docker:27017/adoc?authSource=admin')
+connect(db=settings.MONGO_DB_NAME, host=settings.MONGODB_URI)
 
 
 def get_db_session():

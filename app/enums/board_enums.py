@@ -5,10 +5,9 @@ class BoardAction(StrEnum):
     NO_POST_FOUND = "POST NOT FOUND"
     INVALID_ID_FORMAT = "INVALID ID FORMAT"
     POST_AUTH_FAIL = "POST AUTH FAIL"
+    INVALID_PAGE = "INVALID PAGE"
+    INVALID_PAGE_SIZE = "INVALID PAGE SIZE"
 
-
-class BoardFilterType(StrEnum):
-    USER_ID = "user_id"
 
 
 class BoardOrderType(StrEnum):

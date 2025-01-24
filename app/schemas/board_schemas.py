@@ -2,7 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.enums.board_enums import BoardOrderType
+from app.enums.board_enums import BoardAction, BoardOrderType
+from app.exceptions.board_exception import board_exception_handler
 
 
 class BasePageSchema(BaseModel):
@@ -15,9 +16,9 @@ class BasePageSchema(BaseModel):
         page_size = values.get("page_size", 10)
 
         if page < 1:
-            raise ValueError("page number must be at least 1.")
+            board_exception_handler(detail=BoardAction.INVALID_PAGE)
         if not 5 <= page_size <= 50:
-            raise ValueError("Page size must be between 5 and 50.")
+            board_exception_handler(detail=BoardAction.INVALID_PAGE_SIZE)
 
         return values
 

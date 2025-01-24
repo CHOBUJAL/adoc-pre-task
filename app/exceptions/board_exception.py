@@ -26,3 +26,8 @@ def board_exception_handler(detail: str = None):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=detail
         )
+    elif (detail == BoardAction.INVALID_PAGE or BoardAction.INVALID_PAGE_SIZE):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=detail
+        )

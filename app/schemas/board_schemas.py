@@ -1,13 +1,26 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.enums.board_enums import BoardOrderType
 
 
 class BasePageSchema(BaseModel):
     page: int = Field(default=1, min=1)
-    page_size: int = Field(default=10, max=50)
+    page_size: int = Field(default=10, min=5, max=50)
+
+    @model_validator(mode="before")
+    def validate_page_and_size(cls, values):
+        page = values.get("page", 1)
+        page_size = values.get("page_size", 10)
+
+        if page < 1:
+            raise ValueError("page number must be at least 1.")
+        if not 5 <= page_size <= 50:
+            raise ValueError("Page size must be between 5 and 50.")
+
+        return values
+
 
 class BoardCreateRequest(BaseModel):
     title: str

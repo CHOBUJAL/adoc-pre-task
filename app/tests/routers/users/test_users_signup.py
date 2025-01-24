@@ -95,3 +95,4 @@ def test_signup_success(test_client: TestClient):
     assert response.status_code == status.HTTP_200_OK
     rst_body = response.json()
     assert rst_body["message"] == ResultMessage.SUCCESS
+    assert rst_body["status_code"] == 200

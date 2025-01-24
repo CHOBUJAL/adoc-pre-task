@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from fastapi.testclient import TestClient
 from mongoengine import connect
@@ -34,7 +36,7 @@ def test_client(test_db) -> TestClient:
 
 @pytest.fixture()
 def test_auth_client(test_client):
-    app.dependency_overrides[get_current_user_info] = lambda: JwtPayLoad(id=1)
+    app.dependency_overrides[get_current_user_info] = lambda: JwtPayLoad(user_id=1)
     yield test_client
     app.dependency_overrides = {}
 
@@ -43,10 +45,19 @@ def test_auth_client(test_client):
 def mock_user(test_db) -> UserOrm:
     mock_user = UserOrm(
         email="test@test.com",
-        hashed_password=CryptContext(schemes=["bcrypt"], deprecated="auto").hash("test")
+        hashed_password=CryptContext(schemes=["bcrypt"], deprecated="auto").hash("mock_password")
     )
     test_db.add(mock_user)
     test_db.commit()
     test_db.refresh(mock_user)
 
     return mock_user
+
+
+@pytest.fixture
+def login_data(test_client: TestClient, mock_user) -> dict[str, Any]:
+    response = test_client.post(
+        "/users/login",
+        json={"email": mock_user.email, "password": "mock_password"}
+    )
+    return {"login_body": response.json(), "mock_user": mock_user}

@@ -57,7 +57,7 @@ def decode_access_token(scheme: str, param: str) -> JwtPayLoad:
         )
     # token이 만료되면
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.TOKEN_EXPIRED)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.ACCESS_TOKEN_EXPIRED)
     # token 검증이 실패하면
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=TokenAuth.INVALID_TOKEN)

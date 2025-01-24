@@ -96,7 +96,7 @@ def refresh_user(refresh_body: RefreshRequest, db: Session) -> RefreshResult:
         access_token = create_jwt(user_id=payload["user_id"], token_type=TokenType.ACCESS)
         return RefreshResult(message=ResultMessage.SUCCESS, access_token=access_token)
     except jwt.ExpiredSignatureError:
-        return RefreshResult(message=TokenAuth.TOKEN_EXPIRED)
+        return RefreshResult(message=TokenAuth.REFRESH_TOKEN_EXPIRED)
     except jwt.InvalidTokenError:
         return RefreshResult(message=TokenAuth.INVALID_TOKEN)
 

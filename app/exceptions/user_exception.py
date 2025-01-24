@@ -25,7 +25,8 @@ def user_exception_handler(detail: str = None):
     elif (
         detail == UserAuth.INVALID_PASSWORD
         or TokenAuth.INVALID_TOKEN
-        or TokenAuth.TOKEN_EXPIRED):
+        or TokenAuth.ACCESS_TOKEN_EXPIRED
+        or TokenAuth.REFRESH_TOKEN_EXPIRED):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=detail

@@ -4,6 +4,7 @@ from typing import Annotated
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.core.db import get_mongo_conn
 from app.core.security import get_current_user_info
 from app.enums.board_enums import BoardAction
 from app.enums.common_enums import ResultMessage
@@ -43,7 +44,8 @@ board_required_router = APIRouter(
 @board_required_router.post("")
 def create_board(
     create_info: BoardCreateRequest,
-    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)]
+    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)],
+    mongo: Annotated[None, Depends(get_mongo_conn)],
 ) -> BoardCreateResponse:
     create_rst = board_service.create_board(create_info=create_info, jwt_payload=jwt_payload)
     if create_rst != ResultMessage.SUCCESS:
@@ -54,7 +56,7 @@ def create_board(
 
 
 @board_router.get("")
-def get_all_boards() -> BoardGetListResponse:
+def get_all_boards(mongo: Annotated[None, Depends(get_mongo_conn)],) -> BoardGetListResponse:
     post_list_rst = board_service.get_all_boards()
     if post_list_rst.message != ResultMessage.SUCCESS:
         board_exception_handler(detail=post_list_rst.message)
@@ -64,7 +66,10 @@ def get_all_boards() -> BoardGetListResponse:
 
 
 @board_router.get("/{post_id}")
-def get_board(post_id: Annotated[str, Depends(validate_post_id)]) -> BoardGetResponse:
+def get_board(
+    post_id: Annotated[str, Depends(validate_post_id)],
+    mongo: Annotated[None, Depends(get_mongo_conn)],
+) -> BoardGetResponse:
     post_rst = board_service.get_board(post_id=post_id)
     if post_rst.message != ResultMessage.SUCCESS:
         board_exception_handler(detail=post_rst.message)
@@ -76,7 +81,8 @@ def get_board(post_id: Annotated[str, Depends(validate_post_id)]) -> BoardGetRes
 @board_required_router.delete("/{post_id}")
 def delete_board(
     post_id: Annotated[str, Depends(validate_post_id)],
-    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)]
+    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)],
+    mongo: Annotated[None, Depends(get_mongo_conn)],
 ) -> BoardDeleteResponse:
     delete_rst = board_service.delete_board(post_id=post_id, jwt_payload=jwt_payload)
     if delete_rst.message != ResultMessage.SUCCESS:
@@ -89,7 +95,8 @@ def delete_board(
 def put_board(
     put_info: BoardPutRequest,
     post_id: Annotated[str, Depends(validate_post_id)],
-    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)]
+    jwt_payload: Annotated[JwtPayLoad, Depends(get_current_user_info)],
+    mongo: Annotated[None, Depends(get_mongo_conn)],
 ):
     put_rst = board_service.put_board(
         put_info=put_info, post_id=post_id, jwt_payload=jwt_payload

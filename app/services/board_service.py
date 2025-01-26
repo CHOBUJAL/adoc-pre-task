@@ -27,7 +27,7 @@ def create_board(
         content=create_info.content,
         created_at=get_now_utc()
     )
-
+    print(new_post)
     return board_repository.create_board(new_post)
 
 
@@ -38,6 +38,8 @@ def get_board(post_id: str) -> BoardGetResult:
 
 def get_all_boards(boards_query: BoardListQueryRequest) -> BoardGetListResult:
     all_posts = board_repository.get_all_boards(boards_query=boards_query)
+    all_posts.page = boards_query.page
+    all_posts.page_size = boards_query.page_size
     return all_posts
 
 

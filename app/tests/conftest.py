@@ -1,8 +1,10 @@
 from typing import Any
+from datetime import timedelta
 
 import pytest
 from fastapi.testclient import TestClient
-from mongoengine import connect
+from mongoengine import connect, disconnect
+from mongoengine.context_managers import switch_db
 from passlib.context import CryptContext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -10,13 +12,12 @@ from sqlalchemy.orm import Session
 from app.core.db import get_db_session
 from app.core.security import get_current_user_info
 from app.core.settings import settings
+from app.core.utils import get_now_utc
 from app.main import app
+from app.models.board_model import Board
 from app.models.model import Base
 from app.models.user_model import UserOrm
 from app.schemas.user_schemas import JwtPayLoad
-
-connect(db='adoc', host='mongodb://adoc:adoc@mongodb-container.docker:27017/adoc?authSource=admin')
-
 
 
 @pytest.fixture()
@@ -65,3 +66,55 @@ def login_data(test_client: TestClient, mock_user) -> dict[str, Any]:
         json={"email": mock_user.email, "password": "mock_password"}
     )
     return {"login_body": response.json(), "mock_user": mock_user}
+
+
+@pytest.fixture()
+def test_mongo_connection():
+    # MongoDB 연결
+    connection = connect(
+        db=settings.TEST_MONGO_DB_NAME,
+        alias=settings.TEST_MONGO_DB_NAME,
+        host=settings.TEST_MONGODB_URI
+    )
+    connection.drop_database(settings.TEST_MONGO_DB_NAME)
+    yield connection
+    disconnect(alias=settings.TEST_MONGO_DB_NAME)
+
+
+@pytest.fixture()
+def mock_board(test_mongo_connection) -> Board:
+    with switch_db(Board, settings.TEST_MONGO_DB_NAME) as TestBoard:
+        for i in range(1):
+            for j in range(1):
+                user_id = i+1
+                temp_post = TestBoard(
+                    author_id=user_id,
+                    title=f"mock_{user_id}_{j}",
+                    content=(
+                                f"mock content from user {user_id} "
+                                f"this is mock {j} * {j} content"
+                            ),
+                    created_at=get_now_utc()
+                )
+                temp_post.save()
+
+# 게시판 리스트 관련 테스트를 위 총 3개의 유저 아이디
+# 각 유저마다 10개의 게시글 작성하도록 구성
+@pytest.fixture()
+def mock_many_boards(test_mongo_connection) -> Board:
+    sample_created_at = get_now_utc()
+    with switch_db(Board, settings.TEST_MONGO_DB_NAME) as TestBoard:
+        for i in range(3):
+            for j in range(i+10):
+                sample_created_at += timedelta(minutes=86)
+                user_id = i+1
+                temp_post = TestBoard(
+                    author_id=user_id,
+                    title=f"mock_{user_id}_{j}",
+                    content=(
+                                f"mock content from user {user_id} "
+                                f"this is mock {j} * {j} content"
+                            ),
+                    created_at=sample_created_at
+                )
+                temp_post.save()

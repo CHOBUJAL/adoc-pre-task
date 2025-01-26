@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     MONGO_DB_NAME: str = "adoc"
 
     TEST_DB_URL: str = "mysql+pymysql://adoc:adoc@mysql-container.docker/test"
+    TEST_MONGODB_URI: str = "mongodb://adoc:adoc@mongodb-container.docker:27017/test?authSource=admin"
     TEST_MONGO_DB_NAME: str = "test"
 
     INIT_USER_EMAIL: str = "test@test.com"

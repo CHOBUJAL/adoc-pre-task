@@ -20,7 +20,8 @@ from app.schemas.board_schemas import (
 def create_board(new_post: Board) -> BoardCreateResult:
     try:
         new_post.save()
-    except Exception:
+    except Exception as e:
+        print(e)
         return BoardCreateResult(message=ResultMessage.ERROR)
     return BoardCreateResult(message=ResultMessage.SUCCESS, post_id=str(new_post.id))
 
@@ -29,7 +30,7 @@ def get_all_boards(boards_query: BoardListQueryRequest) -> BoardGetListResult:
     try:
         # 게시글 필터
         filter_boards = Board.objects()
-        if boards_query.user_id:
+        if boards_query.user_id or boards_query.user_id == 0:
             filter_boards = filter_boards.filter(author_id=boards_query.user_id)
         if boards_query.title:
             # 대소문자 구분 x

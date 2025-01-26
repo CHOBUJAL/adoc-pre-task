@@ -49,8 +49,8 @@ def create_board(
     mongo: Annotated[None, Depends(get_mongo_conn)] = None,
 ) -> BoardCreateResponse:
     create_rst = board_service.create_board(create_info=create_info, jwt_payload=jwt_payload)
-    if create_rst != ResultMessage.SUCCESS:
-        board_exception_handler(detail=create_rst)
+    if create_rst.message != ResultMessage.SUCCESS:
+        board_exception_handler(detail=create_rst.message)
     return BoardCreateResponse(
         message=create_rst.message, status_code=status.HTTP_200_OK, post_id=create_rst.post_id
     )
@@ -68,7 +68,9 @@ def get_all_boards(
         message=post_list_rst.message,
         status_code=status.HTTP_200_OK,
         post_list=post_list_rst.post_list,
-        total_count=post_list_rst.total_count
+        total_count=post_list_rst.total_count,
+        page=post_list_rst.page,
+        page_size=post_list_rst.page_size
     )
 
 

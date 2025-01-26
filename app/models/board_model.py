@@ -6,7 +6,6 @@ from mongoengine import DateTimeField, Document, IntField, StringField
 class Board(Document):
     meta = {
         "collection": "boards",
-        "db_alias": "default",
         "indexes": [
             "author_id", "title"
         ]

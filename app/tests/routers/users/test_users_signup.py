@@ -1,5 +1,4 @@
 from fastapi import status
-from fastapi.testclient import TestClient
 
 from app.enums.common_enums import ResultMessage
 from app.enums.user_enums import UserAuth
@@ -7,7 +6,7 @@ from app.schemas.user_schemas import SignUpRequest
 
 
 # 이메일 필드 누락 회원가입 요청
-def test_signup_missing_email(test_client: TestClient):
+def test_signup_missing_email(test_client):
     response = test_client.post(
         "/users/signup",
         json={"password": "test"}
@@ -18,7 +17,7 @@ def test_signup_missing_email(test_client: TestClient):
 
 
 # 패스워드 필드 누락 회원가입 요청
-def test_signup_missing_password(test_client: TestClient):
+def test_signup_missing_password(test_client):
     response = test_client.post(
         "/users/signup",
         json={"email": "test@test.com"}
@@ -29,7 +28,7 @@ def test_signup_missing_password(test_client: TestClient):
 
 
 # 이메일패스워드 필드 누락 회원가입 요청
-def test_signup_missing_emailpassword(test_client: TestClient):
+def test_signup_missing_emailpassword(test_client):
     response = test_client.post(
         "/users/signup",
         json={}
@@ -41,7 +40,7 @@ def test_signup_missing_emailpassword(test_client: TestClient):
 
 
 # 이미 존재하는 이메일 회원가입 요청
-def test_signup_already_user(test_client: TestClient, mock_user):
+def test_signup_already_user(test_client, mock_user):
     signup_body = SignUpRequest(
         email=mock_user.email,
         password="mock",
@@ -56,7 +55,7 @@ def test_signup_already_user(test_client: TestClient, mock_user):
 
 
 # 중복회원 가입
-def test_duplicate_signup(test_client: TestClient):
+def test_duplicate_signup(test_client):
     signup_body = SignUpRequest(
         email="test@test.com",
         password="123"
@@ -83,7 +82,7 @@ def test_duplicate_signup(test_client: TestClient):
 
 
 # 정싱적인 회원가입 요청
-def test_signup_success(test_client: TestClient):
+def test_signup_success(test_client):
     signup_body = SignUpRequest(
         email="test@test.com",
         password="123"

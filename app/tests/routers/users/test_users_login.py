@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
 from fastapi import status
-from fastapi.testclient import TestClient
 
 from app.core.security import (
     decode_jwt,
@@ -12,7 +11,7 @@ from app.enums.user_enums import UserAuth
 
 
 # 이메일 필드 누락 로그인 요청
-def test_login_missing_email(test_client: TestClient):
+def test_login_missing_email(test_client):
     response = test_client.post(
         "/users/login",
         json={"password": "test"}
@@ -23,7 +22,7 @@ def test_login_missing_email(test_client: TestClient):
 
 
 # 패스워드 필드 누락 로그인 요청
-def test_login_missing_password(test_client: TestClient):
+def test_login_missing_password(test_client):
     response = test_client.post(
         "/users/login",
         json={"email": "test@test.com"}
@@ -34,7 +33,7 @@ def test_login_missing_password(test_client: TestClient):
 
 
 # 이메일패스워드 필드 누락 로그인 요청
-def test_login_missing_emailpassword(test_client: TestClient):
+def test_login_missing_emailpassword(test_client):
     response = test_client.post(
         "/users/login",
         json={}
@@ -46,7 +45,7 @@ def test_login_missing_emailpassword(test_client: TestClient):
 
 
 # 존재하지않는 이메일로 로그인
-def test_login_not_found_email(test_client: TestClient, mock_user):
+def test_login_not_found_email(test_client, mock_user):
     response = test_client.post(
         "/users/login",
         json={"email": "not_found_email", "password": "test"}
@@ -57,7 +56,7 @@ def test_login_not_found_email(test_client: TestClient, mock_user):
 
 
 # 잘못된 암호 로그인
-def test_login_fail_password(test_client: TestClient, mock_user):
+def test_login_fail_password(test_client, mock_user):
     response = test_client.post(
         "/users/login",
         json={"email": mock_user.email, "password": "fail_password"}
@@ -68,7 +67,7 @@ def test_login_fail_password(test_client: TestClient, mock_user):
 
 
 # 정상적인 로그인 성공
-def test_login_success(test_client: TestClient, mock_user):
+def test_login_success(test_client, mock_user):
     response = test_client.post(
         "/users/login",
         json={"email": mock_user.email, "password": "mock_password"}

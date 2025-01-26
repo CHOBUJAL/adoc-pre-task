@@ -1,5 +1,5 @@
-from typing import Any
 from datetime import timedelta
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -84,8 +84,8 @@ def test_mongo_connection():
 @pytest.fixture()
 def mock_board(test_mongo_connection) -> Board:
     with switch_db(Board, settings.TEST_MONGO_DB_NAME) as TestBoard:
-        for i in range(1):
-            for j in range(1):
+        for i in range(2):
+            for j in range(2):
                 user_id = i+1
                 temp_post = TestBoard(
                     author_id=user_id,

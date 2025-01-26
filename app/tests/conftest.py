@@ -27,6 +27,8 @@ def test_db():
         yield session
     Base.metadata.drop_all(engine)
 
+# 토큰 인증이 필요없는 경우와 access 토큰에 대한 검증이 필요한 경우
+# 해당 cilent를 사용하면 된다
 @pytest.fixture()
 def test_client(test_db) -> TestClient:
     app.dependency_overrides[get_db_session] = lambda: test_db
@@ -34,6 +36,8 @@ def test_client(test_db) -> TestClient:
     app.dependency_overrides = {}
 
 
+# 토큰 인증 디펜던시를 정상적으로 처리된 형태로 테스트를 원하는 경우
+# 해당 client를 사용하면 된다
 @pytest.fixture()
 def test_auth_client(test_client):
     app.dependency_overrides[get_current_user_info] = lambda: JwtPayLoad(user_id=1)

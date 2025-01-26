@@ -4,6 +4,7 @@ from fastapi import status
 from freezegun import freeze_time
 
 from app.core.utils import get_now_utc
+from app.enums.common_enums import ResultMessage
 from app.enums.security_enums import TokenAuth
 
 
@@ -50,8 +51,23 @@ def test_refresh_token_fail_user_id(test_auth_client, login_data):
     response = test_auth_client.post(
         "/users/refresh",
         json={
-            "user_id": (login_data["login_body"]["user_id"]+10),
+            "user_id": -1,
             "refresh_token": login_data["login_body"]["refresh_token"]
+        }
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    rst_body = response.json()
+    assert rst_body["detail"] == TokenAuth.INVALID_TOKEN
+
+
+# 잘못된 형태의 refresh token으로 요청
+def test_refresh_token_wrong_type(test_auth_client, login_data):
+    replace_token = login_data["login_body"]["refresh_token"].replace(".", "")
+    response = test_auth_client.post(
+        "/users/refresh",
+        json={
+            "user_id": (login_data["login_body"]["user_id"]+10),
+            "refresh_token": replace_token
         }
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -78,24 +94,19 @@ def test_expired_access_token(test_client, login_data):
         assert rst_body["detail"] == TokenAuth.ACCESS_TOKEN_EXPIRED
 
 
-# 잘못된 형태의 refresh token으로 요청
-def test_refresh_token_wrong_type(test_auth_client, login_data):
-    replace_token = login_data["login_body"]["refresh_token"].replace(".", "")
-    response = test_auth_client.post(
+# auto header 미포함 요청
+def test_refresh_not_auth_header(test_client):
+    response = test_client.post(
         "/users/refresh",
-        json={
-            "user_id": (login_data["login_body"]["user_id"]+10),
-            "refresh_token": replace_token
-        }
+        json={"user_id": 1}
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
     rst_body = response.json()
-    assert rst_body["detail"] == TokenAuth.INVALID_TOKEN
+    assert rst_body["detail"] == "Not authenticated"
 
 
-# 만료된 access token으로 요청
-def test_access_token_wrong_type(test_client, login_data):
-    replace_token = login_data["login_body"]["access_token"].replace(".", "")
+# 새로운 access token 정상 발급
+def test_refresh_to_access_token_success(test_client, login_data):
     response = test_client.post(
         "/users/refresh",
         json={
@@ -103,9 +114,23 @@ def test_access_token_wrong_type(test_client, login_data):
             "refresh_token": login_data["login_body"]["refresh_token"]
         },
         headers={
-            "Authorization": f"Bearer {replace_token}"
+            "Authorization": f"Bearer {login_data['login_body']['access_token']}"
         }
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_200_OK
     rst_body = response.json()
-    assert rst_body["detail"] == TokenAuth.INVALID_TOKEN
+    assert rst_body["message"] == ResultMessage.SUCCESS
+    assert rst_body["status_code"] == 200
+
+    # 발급받은 새로운 access token이 유효한지 다시한번 토큰 요청 진행
+    retry_response = test_client.post(
+        "/users/refresh",
+        json={
+            "user_id": login_data["login_body"]["user_id"],
+            "refresh_token": login_data["login_body"]["refresh_token"]
+        },
+        headers={
+            "Authorization": f"Bearer {rst_body["access_token"]}"
+        }
+    )
+    assert retry_response.status_code == status.HTTP_200_OK

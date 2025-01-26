@@ -20,8 +20,7 @@ from app.schemas.board_schemas import (
 def create_board(new_post: Board) -> BoardCreateResult:
     try:
         new_post.save()
-    except Exception as e:
-        print(e)
+    except Exception:
         return BoardCreateResult(message=ResultMessage.ERROR)
     return BoardCreateResult(message=ResultMessage.SUCCESS, post_id=str(new_post.id))
 

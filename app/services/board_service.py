@@ -27,7 +27,6 @@ def create_board(
         content=create_info.content,
         created_at=get_now_utc()
     )
-    print(new_post)
     return board_repository.create_board(new_post)
 
 

@@ -1,9 +1,8 @@
-from mongoengine import connect, disconnect
+from mongoengine import connect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from app.core.settings import settings
-
 
 mysql_engine = create_engine(settings.DB_URL, echo=True)
 connect(db=settings.MONGO_DB_NAME, alias="default", host=settings.MONGODB_URI)

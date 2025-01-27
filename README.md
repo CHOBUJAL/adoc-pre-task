@@ -9,6 +9,7 @@
 ## 서버 실행 방법
 #### 로컬 환경에서 docker compose 기반 동작
 #### BackEnd, Mysql, MongoDB 모두 하나의 compose에 종속
+- 설정 파일은 app/core/settings.py 참조
 ```
 docker compose up -d
 (DB 마이그레이션의 경우, 서버가 정상적으로 동작되면 자동 마이그레이션 진행되게 세팅)
@@ -24,6 +25,7 @@ docker exec -it adoc-backend alembic upgrade head
 ### Test 진행(pytest)
 ```
 docker exec -it adoc-backend pytest --cov=app --cov-report=term-missing -v
+(test 목록은 app/tests 디렉토리에 존재)
 ```
 
 
@@ -42,6 +44,7 @@ login 요청 시, access token 갱신
 login 요청 시, refresh token이 만료되었거나 존재하지 않으면 생성 및 업데이트
 access token 재발급 요청 시 "access token 유효 and refresh token 유효" 인 경우 재발급
 logout이면 요청 유저의 refresh token 삭제
+(token 유효시간은 app/core/settings.py를 참조)
 ```
 1. **회원가입** (POST /users/signup)
 2. **로그인** (POST /users/login)

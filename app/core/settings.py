@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     JWT_SECRET_KEY: str = "SN7tHQSm9zmPUzU6X2dMWojt8zpV3D3pXoGPg8MV5b2xnHk"
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_SECS: int = 900 # 15분
+    ACCESS_TOKEN_EXPIRE_SECS: int = 20 # 15분
     REFRESH_TOKEN_EXPIRE_SECS: int = 259200 # 3일
 
 

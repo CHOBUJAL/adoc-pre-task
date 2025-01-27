@@ -43,8 +43,8 @@ docker exec -it adoc-backend pytest --cov=app --cov-report=term-missing -v
 login 요청 시, access token 갱신
 login 요청 시, refresh token이 만료되었거나 존재하지 않으면 생성 및 업데이트
 access token 재발급 요청 시 "access token 유효 and refresh token 유효" 인 경우 재발급
-logout이면 요청 유저의 refresh token 삭제
 (token 유효시간은 app/core/settings.py를 참조)
+logout이면 요청 유저의 refresh token 삭제
 ```
 1. **회원가입** (POST /users/signup)
 2. **로그인** (POST /users/login)

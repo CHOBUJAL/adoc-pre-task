@@ -1,31 +1,56 @@
-# 유저관리
-### 회원가입 (POST /users/signup)
-- MySQL에 유저 정보 저장 (id, email, password_hash, created_at)
-- 비밀번호는 해싱 처리 필요(일반 문자열 저장 금지)
-### 로그인 (POST /users/login)
-- 이메일과 비밀번호 확인 후, 다음을 반환:
-- 짧은 만료 기간을 갖는 Access Token (예: 15분~1시간 내 만료)
-- 더 긴 만료 기간을 갖는 Refresh Token (예: 7일~14일 내 만료)
-- Refresh Token은 MySQL에 저장(또는 유저별로 관리)하여 이후 토큰 재발급 시 검증에 사용
-### 토큰 재발급 (POST /users/refresh)
-- Refresh Token을 검증 후, 새로운 Access Token 발급
-- Refresh Token 또한 갱신할지 여부는 자율적으로 판단 (일반적으로 재발급 시 Refresh Token 유지 또는 재발급)
-### 로그아웃 (POST /users/logout)
-- Refresh Token 무효화 처리 (DB 상에서 해당 토큰 삭제 혹은 블랙리스트 처리 등)  
+# 비바이노베이션 사전 과제
+## 개요
+#### 가상환경(의존성 관리 및 환경 설정) : poetry
+#### 데이터베이스 마이그레이션(스키마 관리) : alembic
+#### Test(단위 테스트 및 커버리지 측정) : pytest
+#### Linter(코드 품질 검사 및 포매팅): ruff
+#### docker Compose를 활용해 게시판 애플리케이션(백엔드, MySQL, MongoDB)을 컨테이너로 실행
 
-# 게시글 관리(CRUD)
-### 게시글 생성 (POST /posts)
-- Access Token 인증 필요
-- MongoDB에 게시글 저장(id, title, content, author_id, created_at)
-### 게시글 조회 (GET /posts/{post_id})
-- 인증 불필요
-- 지정한 post_id의 게시글 반환
-### 게시글 리스트 조회 (GET /posts)
-- 인증 불필요
-- 페이지네이션(?page=1&page_size=10) 및 작성자 필터(?author_id=) 등의 간단한 기능 제공
-### 게시글 수정 (PUT /posts/{post_id})
-- Access Token 인증 필요
-- 해당 게시글 작성자와 토큰 내 user_id가 일치해야 수정 가능
-### 게시글 삭제 (DELETE /posts/{post_id})
-- Access Token 인증 필요
-- 해당 게시글 작성자와 토큰 내 user_id가 일치해야 삭제 가능
+## 서버 실행 방법
+#### 로컬 환경에서 docker compose 기반 동작
+#### BackEnd, Mysql, MongoDB 모두 하나의 compose에 종속
+```
+docker compose up -d
+(DB 마이그레이션의 경우, 서버가 정상적으로 동작되면 자동 마이그레이션 진행되게 세팅)
+```
+#### 동작중인 컨테이너 로그 확인
+```
+docker logs "container_name" -f
+```
+#### 데이터베이스 수동 마이그레이션
+```
+docker exec -it adoc-backend alembic upgrade head
+```
+### Test 진행(pytest)
+```
+docker exec -it adoc-backend pytest --cov=app --cov-report=term-missing -v
+```
+
+
+## API 목록
+### API 문서 확인
+- 서버가 정상적으로 동작하면 다음 경로에서 API 문서를 확인
+  - Swagger: [http://localhost:8000/docs](http://localhost:8000/docs)
+    - 요청/응답 구조 및 테스트 UI 제공
+  - ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+    - OpenAPI 스펙(JSON) 다운로드 및 상세 문서 제공
+### 1. 유저관리
+- User 모델과 RefreshToken 모델 1:1 관계 매핑
+- Token 전략
+```
+login 요청 시, access token 갱신
+login 요청 시, refresh token이 만료되었거나 존재하지 않으면 생성 및 업데이트
+access token 재발급 요청 시 "access token 유효 and refresh token 유효" 인 경우 재발급
+logout이면 요청 유저의 refresh token 삭제
+```
+1. **회원가입** (POST /users/signup)
+2. **로그인** (POST /users/login)
+3. **토큰 재발급** (POST /users/refresh)
+4. **로그아웃** (POST /users/logout)
+
+### 2. 게시글 관리(CRUD)
+1. **게시글 생성** (POST /posts)
+2. **게시글 조회** (GET /posts/{post_id})
+3. **게시글 리스트 조회** (GET /posts)
+4. **게시글 수정** (PUT /posts/{post_id})
+5. **게시글 삭제** (DELETE /posts/{post_id})
